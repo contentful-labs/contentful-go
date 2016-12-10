@@ -1,0 +1,216 @@
+{
+  "sys": {
+    "type": "Array"
+  },
+  "total": 5,
+  "skip": 0,
+  "limit": 100,
+  "items": [
+    {
+      "sys": {
+        "space": {
+          "sys": {
+            "type": "Link",
+            "linkType": "Space",
+            "id": "cfexampleapi"
+          }
+        },
+        "id": "1x0xpXu4pSGS4OukSyWGUK",
+        "type": "Asset",
+        "createdAt": "2013-11-06T09:45:10.000Z",
+        "updatedAt": "2013-12-18T13:27:14.917Z",
+        "revision": 6,
+        "locale": "en-US"
+      },
+      "fields": {
+        "title": "Doge",
+        "description": "nice picture",
+        "file": {
+          "url": "//images.contentful.com/cfexampleapi/1x0xpXu4pSGS4OukSyWGUK/cc1239c6385428ef26f4180190532818/doge.jpg",
+          "details": {
+            "size": 522943,
+            "image": {
+              "width": 5800,
+              "height": 4350
+            }
+          },
+          "fileName": "doge.jpg",
+          "contentType": "image/jpeg"
+        }
+      }
+    },
+    {
+      "fields": {
+        "file": {
+          "en-US": {
+            "fileName": "d3b8dad44e5066cfb805e2357469ee64.png",
+            "contentType": "image/png",
+            "details": {
+              "image": {
+                "width": 206,
+                "height": 79
+              },
+              "size": 6198
+            },
+            "url": "//images.flinkly.com/222ru4k10hm8/3HNzx9gvJScKku4UmcekYw/997663077456077dde5b5be9bd3c1386/d3b8dad44e5066cfb805e2357469ee64.png"
+          },
+          "de": {
+            "fileName": "d3b8dad44e5066cfb805e2357469ee64.png",
+            "contentType": "image/png",
+            "details": {
+              "image": {
+                "width": 206,
+                "height": 79
+              },
+              "size": 6198
+            },
+            "url": "//images.flinkly.com/222ru4k10hm8/3HNzx9gvJScKku4UmcekYw/997663077456077dde5b5be9bd3c1386/d3b8dad44e5066cfb805e2357469ee64.png-de"
+          }
+        },
+        "title": {
+          "en-US": "hehehe",
+          "de": "hehehe-de"
+        },
+        "description": {
+          "en-US": "asdfasf",
+          "de": "asdfasf-de"
+        }
+      },
+      "sys": {
+        "id": "3HNzx9gvJScKku4UmcekYw",
+        "type": "Asset",
+        "createdAt": "2017-03-13T08:57:35.075Z",
+        "createdBy": {
+          "sys": {
+            "type": "Link",
+            "linkType": "User",
+            "id": "50ZPikUCLbyl9V6zQZNWSL"
+          }
+        },
+        "space": {
+          "sys": {
+            "type": "Link",
+            "linkType": "Space",
+            "id": "222ru4k10hm8"
+          }
+        },
+        "firstPublishedAt": "2017-03-13T08:58:05.490Z",
+        "publishedCounter": 1,
+        "publishedAt": "2017-03-13T08:58:05.490Z",
+        "publishedBy": {
+          "sys": {
+            "type": "Link",
+            "linkType": "User",
+            "id": "50ZPikUCLbyl9V6zQZNWSL"
+          }
+        },
+        "publishedVersion": 8,
+        "version": 9,
+        "updatedAt": "2017-03-13T08:58:05.535Z",
+        "updatedBy": {
+          "sys": {
+            "type": "Link",
+            "linkType": "User",
+            "id": "50ZPikUCLbyl9V6zQZNWSL"
+          }
+        }
+      }
+    },
+    {
+      "sys": {
+        "space": {
+          "sys": {
+            "type": "Link",
+            "linkType": "Space",
+            "id": "cfexampleapi"
+          }
+        },
+        "id": "happycat",
+        "type": "Asset",
+        "createdAt": "2013-09-02T14:56:34.267Z",
+        "updatedAt": "2013-09-02T15:11:24.361Z",
+        "revision": 2,
+        "locale": "en-US"
+      },
+      "fields": {
+        "title": "Happy Cat",
+        "file": {
+          "url": "//images.contentful.com/cfexampleapi/3MZPnjZTIskAIIkuuosCss/382a48dfa2cb16c47aa2c72f7b23bf09/happycatw.jpg",
+          "details": {
+            "size": 59939,
+            "image": {
+              "width": 273,
+              "height": 397
+            }
+          },
+          "fileName": "happycatw.jpg",
+          "contentType": "image/jpeg"
+        }
+      }
+    },
+    {
+      "sys": {
+        "space": {
+          "sys": {
+            "type": "Link",
+            "linkType": "Space",
+            "id": "cfexampleapi"
+          }
+        },
+        "id": "nyancat",
+        "type": "Asset",
+        "createdAt": "2013-09-02T14:56:34.240Z",
+        "updatedAt": "2013-09-02T14:56:34.240Z",
+        "revision": 1,
+        "locale": "en-US"
+      },
+      "fields": {
+        "title": "Nyan Cat",
+        "file": {
+          "url": "//images.contentful.com/cfexampleapi/4gp6taAwW4CmSgumq2ekUm/9da0cd1936871b8d72343e895a00d611/Nyan_cat_250px_frame.png",
+          "details": {
+            "size": 12273,
+            "image": {
+              "width": 250,
+              "height": 250
+            }
+          },
+          "fileName": "Nyan_cat_250px_frame.png",
+          "contentType": "image/png"
+        }
+      }
+    },
+    {
+      "sys": {
+        "space": {
+          "sys": {
+            "type": "Link",
+            "linkType": "Space",
+            "id": "cfexampleapi"
+          }
+        },
+        "id": "jake",
+        "type": "Asset",
+        "createdAt": "2013-09-02T14:56:34.260Z",
+        "updatedAt": "2013-09-02T15:22:39.466Z",
+        "revision": 2,
+        "locale": "en-US"
+      },
+      "fields": {
+        "title": "Jake",
+        "file": {
+          "url": "//images.contentful.com/cfexampleapi/4hlteQAXS8iS0YCMU6QMWg/2a4d826144f014109364ccf5c891d2dd/jake.png",
+          "details": {
+            "size": 20480,
+            "image": {
+              "width": 100,
+              "height": 161
+            }
+          },
+          "fileName": "jake.png",
+          "contentType": "image/png"
+        }
+      }
+    }
+  ]
+}

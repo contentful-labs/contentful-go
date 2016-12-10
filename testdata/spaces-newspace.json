@@ -1,0 +1,24 @@
+{
+  "name": "new space",
+  "sys": {
+    "type": "Space",
+    "id": "newspace",
+    "version": 1,
+    "createdBy": {
+      "sys": {
+        "type": "Link",
+        "linkType": "User",
+        "id": "50ZPikUCLbyl9V6zQZNWSL"
+      }
+    },
+    "createdAt": "2017-03-12T13:08:46Z",
+    "updatedBy": {
+      "sys": {
+        "type": "Link",
+        "linkType": "User",
+        "id": "50ZPikUCLbyl9V6zQZNWSL"
+      }
+    },
+    "updatedAt": "2017-03-12T13:08:46Z"
+  }
+}

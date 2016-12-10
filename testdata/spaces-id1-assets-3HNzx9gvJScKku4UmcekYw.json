@@ -1,0 +1,77 @@
+{
+  "fields": {
+    "file": {
+      "en-US": {
+        "fileName": "d3b8dad44e5066cfb805e2357469ee64.png",
+        "contentType": "image/png",
+        "details": {
+          "image": {
+            "width": 206,
+            "height": 79
+          },
+          "size": 6198
+        },
+        "url": "//images.flinkly.com/222ru4k10hm8/3HNzx9gvJScKku4UmcekYw/997663077456077dde5b5be9bd3c1386/d3b8dad44e5066cfb805e2357469ee64.png"
+      },
+      "de": {
+        "fileName": "d3b8dad44e5066cfb805e2357469ee64.png",
+        "contentType": "image/png",
+        "details": {
+          "image": {
+            "width": 206,
+            "height": 79
+          },
+          "size": 6198
+        },
+        "url": "//images.flinkly.com/222ru4k10hm8/3HNzx9gvJScKku4UmcekYw/997663077456077dde5b5be9bd3c1386/d3b8dad44e5066cfb805e2357469ee64.png-de"
+      }
+    },
+    "title": {
+      "en-US": "hehehe",
+      "de": "hehehe-de"
+    },
+    "description": {
+      "en-US": "asdfasf",
+      "de": "asdfasf-de"
+    }
+  },
+  "sys": {
+    "id": "3HNzx9gvJScKku4UmcekYw",
+    "type": "Asset",
+    "createdAt": "2017-03-13T08:57:35.075Z",
+    "createdBy": {
+      "sys": {
+        "type": "Link",
+        "linkType": "User",
+        "id": "50ZPikUCLbyl9V6zQZNWSL"
+      }
+    },
+    "space": {
+      "sys": {
+        "type": "Link",
+        "linkType": "Space",
+        "id": "222ru4k10hm8"
+      }
+    },
+    "firstPublishedAt": "2017-03-13T08:58:05.490Z",
+    "publishedCounter": 1,
+    "publishedAt": "2017-03-13T08:58:05.490Z",
+    "publishedBy": {
+      "sys": {
+        "type": "Link",
+        "linkType": "User",
+        "id": "50ZPikUCLbyl9V6zQZNWSL"
+      }
+    },
+    "publishedVersion": 8,
+    "version": 9,
+    "updatedAt": "2017-03-13T08:58:05.535Z",
+    "updatedBy": {
+      "sys": {
+        "type": "Link",
+        "linkType": "User",
+        "id": "50ZPikUCLbyl9V6zQZNWSL"
+      }
+    }
+  }
+}

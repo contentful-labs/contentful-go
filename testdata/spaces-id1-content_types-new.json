@@ -1,0 +1,30 @@
+{
+  "sys": {
+    "type": "ContentType",
+    "id": "3ORKIAOaJqQWWg86MWkyOs",
+    "space": {
+      "sys": {
+        "type": "Link",
+        "linkType": "Space",
+        "id": "fp91oelsziea"
+      }
+    },
+    "version": 1,
+    "createdAt": "2015-05-18T11:29:46.809Z",
+    "createdBy": {
+      "sys": {
+        "type": "Link",
+        "linkType": "User",
+        "id": "4FLrUHftHW3v2BLi9fzfjU"
+      }
+    },
+    "updatedAt": "2015-05-18T11:29:46.809Z",
+    "updatedBy": {
+      "sys": {
+        "type": "Link",
+        "linkType": "User",
+        "id": "4FLrUHftHW3v2BLi9fzfjU"
+      }
+    }
+  }
+}

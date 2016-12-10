@@ -1,0 +1,32 @@
+{
+  "sys": {
+    "space": {
+      "sys": {
+        "type": "Link",
+        "linkType": "Space",
+        "id": "cfexampleapi"
+      }
+    },
+    "id": "happycat",
+    "type": "Asset",
+    "createdAt": "2013-09-02T14:56:34.267Z",
+    "updatedAt": "2013-09-02T15:11:24.361Z",
+    "revision": 2,
+    "locale": "en-US"
+  },
+  "fields": {
+    "title": "Happy Cat",
+    "file": {
+      "url": "//images.contentful.com/cfexampleapi/3MZPnjZTIskAIIkuuosCss/382a48dfa2cb16c47aa2c72f7b23bf09/happycatw.jpg",
+      "details": {
+        "size": 59939,
+        "image": {
+          "width": 273,
+          "height": 397
+        }
+      },
+      "fileName": "happycatw.jpg",
+      "contentType": "image/jpeg"
+    }
+  }
+},
