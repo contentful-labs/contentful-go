@@ -1,0 +1,8 @@
+{
+  "requestId": "request-id",
+  "message": "The resource could not be found.",
+  "sys": {
+	"type": "Error",
+	"id": "NotFound"
+  }
+}
