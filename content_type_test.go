@@ -58,29 +58,28 @@ func TestContentTypeSaveForCreate(t *testing.T) {
 	space, err := spaceFromTestData("space-1.json")
 	assert.Nil(err)
 
-	// webhook
+	// content type
 	ct := space.NewContentType()
 	ct.Name = "ct-name"
 	ct.Type = "ct-type"
 	ct.Description = "ct-description"
 
-	fields := []*Field{
-		&Field{
-			ID:       "field1",
-			Name:     "field1-name",
-			Type:     "Symbol",
-			Required: true,
-		},
-		&Field{
-			ID:       "field2",
-			Name:     "field2-name",
-			Type:     "Symbol",
-			Disabled: true,
-		},
+	field1 := &Field{
+		ID:       "field1",
+		Name:     "field1-name",
+		Type:     "Symbol",
+		Required: true,
 	}
 
-	ct.Fields = fields
-	ct.DisplayField = fields[0].ID
+	field2 := &Field{
+		ID:       "field2",
+		Name:     "field2-name",
+		Type:     "Symbol",
+		Disabled: true,
+	}
+
+	ct.Fields = []*Field{field1, field2}
+	ct.DisplayField = field1.ID
 
 	err = ct.Save()
 	assert.Nil(err)
@@ -198,5 +197,76 @@ func TestContentTypeDelete(t *testing.T) {
 	assert.Nil(err)
 
 	err = ct.Delete()
+	assert.Nil(err)
+}
+
+func TestContentTypeFieldRef(t *testing.T) {
+	var err error
+	assert := assert.New(t)
+
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(r.Method, "POST")
+		assert.Equal(r.RequestURI, "/spaces/"+spaceID+"/content_types")
+		checkHeaders(r, assert)
+
+		var payload map[string]interface{}
+		err := json.NewDecoder(r.Body).Decode(&payload)
+		assert.Nil(err)
+
+		fields := payload["fields"].([]interface{})
+		assert.Equal(1, len(fields))
+
+		field1 := fields[0].(map[string]interface{})
+		assert.Equal("Link", field1["type"].(string))
+		validations := field1["validations"].([]interface{})
+		assert.Equal(1, len(validations))
+		validation := validations[0].(map[string]interface{})
+		linkValidationValue := validation["linkContentType"].([]interface{})
+		assert.Equal(1, len(linkValidationValue))
+		assert.Equal("63Vgs0BFK0USe4i2mQUGK6", linkValidationValue[0].(string))
+
+		w.WriteHeader(201)
+		fmt.Fprintln(w, string(readTestData("content_type.json")))
+	})
+
+	// test server
+	server := httptest.NewServer(handler)
+	defer server.Close()
+
+	// cma client
+	cma = NewCMA(CMAToken)
+	cma.BaseURL = server.URL
+
+	// test space
+	space, err := spaceFromTestData("space-1.json")
+	assert.Nil(err)
+
+	// test content type
+	linkCt, err := contentTypeFromTestData("content_type.json")
+	assert.Nil(err)
+
+	// content type
+	ct := space.NewContentType()
+	ct.Name = "ct-name"
+	ct.Type = "ct-type"
+	ct.Description = "ct-description"
+
+	field1Validation := &FieldValidation{
+		LinkContentType: []string{linkCt.Sys.ID},
+	}
+
+	field1 := &Field{
+		ID:   "field1",
+		Name: "field1-name",
+		Type: "Link",
+		Validations: []*FieldValidation{
+			field1Validation,
+		},
+	}
+
+	ct.Fields = []*Field{field1}
+	ct.DisplayField = field1.ID
+
+	err = ct.Save()
 	assert.Nil(err)
 }

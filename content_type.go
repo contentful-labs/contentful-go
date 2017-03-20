@@ -21,14 +21,20 @@ type ContentType struct {
 
 // Field model
 type Field struct {
-	ID        string  `json:"id,omitempty"`
-	Name      string  `json:"name"`
-	Type      string  `json:"type"`
-	Items     *Schema `json:"items,omitempty"`
-	Required  bool    `json:"required,omitempty"`
-	Localized bool    `json:"localized,omitempty"`
-	Disabled  bool    `json:"disabled,omitempty"`
-	Omitted   bool    `json:"omitted,omitempty"`
+	ID          string             `json:"id,omitempty"`
+	Name        string             `json:"name"`
+	Type        string             `json:"type"`
+	Items       *Schema            `json:"items,omitempty"`
+	Required    bool               `json:"required,omitempty"`
+	Localized   bool               `json:"localized,omitempty"`
+	Disabled    bool               `json:"disabled,omitempty"`
+	Omitted     bool               `json:"omitted,omitempty"`
+	Validations []*FieldValidation `json:"validations,omitempty"`
+}
+
+// FieldValidation model
+type FieldValidation struct {
+	LinkContentType []string `json:"linkContentType,omitempty"`
 }
 
 // Schema model

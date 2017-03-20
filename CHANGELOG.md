@@ -4,6 +4,7 @@ v0.0.2-rc (TBA)
 * `entity/space`: add tests for space entity.
 * `errors`: add tests for error handler.
 * `entity/content_type`: add test for content type entity.
+* `entity/content_type`: Field validations added for link type
 
 v0.0.1 (2017-03-20)
 ===
