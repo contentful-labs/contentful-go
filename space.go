@@ -3,7 +3,6 @@ package contentful
 import (
 	"bytes"
 	"encoding/json"
-	"net/http"
 	"net/url"
 	"strconv"
 )
@@ -19,6 +18,59 @@ type Space struct {
 // ID returns the sys.id
 func (s *Space) ID() string {
 	return s.Sys.ID
+}
+
+// Save saves the space
+func (s *Space) Save() error {
+	bytesArray, err := json.Marshal(s)
+	if err != nil {
+		return err
+	}
+
+	var path string
+	var method string
+
+	if s.Sys.CreatedAt != "" {
+		path = "/spaces/" + s.ID()
+		method = "PUT"
+	} else {
+		path = "/spaces"
+		method = "POST"
+	}
+
+	req, err := s.c.newRequest(method, path, nil, bytes.NewReader(bytesArray))
+	if err != nil {
+		return err
+	}
+
+	version := strconv.Itoa(s.Sys.Version)
+	req.Header.Set("X-Contentful-Version", version)
+
+	if ok := s.c.do(req, s); ok != nil {
+		return ok
+	}
+
+	return nil
+}
+
+// Delete the space
+func (s *Space) Delete() error {
+	path := "/spaces/" + s.ID()
+	method := "DELETE"
+
+	req, err := s.c.newRequest(method, path, nil, nil)
+	if err != nil {
+		return err
+	}
+
+	version := strconv.Itoa(s.Sys.Version)
+	req.Header.Set("X-Contentful-Version", version)
+
+	if err = s.c.do(req, nil); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // GetLocales returns a locales collection
@@ -290,66 +342,4 @@ func (s *Space) GetContentTypes() *Collection {
 	col.req = req
 
 	return col
-}
-
-func (s *Space) getSaveReq() (*http.Request, error) {
-	bytesArray, err := json.Marshal(s)
-	if err != nil {
-		return nil, err
-	}
-
-	var path string
-	var method string
-
-	if s.Sys.CreatedAt != "" {
-		path = "/spaces/" + s.ID()
-		method = "PUT"
-	} else {
-		path = "/spaces"
-		method = "POST"
-	}
-
-	req, err := s.c.newRequest(method, path, nil, bytes.NewReader(bytesArray))
-	if err != nil {
-		return nil, err
-	}
-
-	version := strconv.Itoa(s.Sys.Version)
-	req.Header.Set("X-Contentful-Version", version)
-
-	return req, nil
-}
-
-// Save saves the space
-func (s *Space) Save() error {
-	req, err := s.getSaveReq()
-	if err != nil {
-		return err
-	}
-
-	if ok := s.c.do(req, s); ok != nil {
-		return ok
-	}
-
-	return nil
-}
-
-// Delete the space
-func (s *Space) Delete() error {
-	path := "/spaces/" + s.ID()
-	method := "DELETE"
-
-	req, err := s.c.newRequest(method, path, nil, nil)
-	if err != nil {
-		return err
-	}
-
-	version := strconv.Itoa(s.Sys.Version)
-	req.Header.Set("X-Contentful-Version", version)
-
-	if err = s.c.do(req, nil); err != nil {
-		return err
-	}
-
-	return nil
 }
