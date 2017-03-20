@@ -1,8 +1,9 @@
 v0.0.2-rc (TBA)
 ===
-* `entity/webhook`: add tests for webhook entity
-* `entity/space`: add tests for space entity
-* `errors`: add tests for error handler
+* `entity/webhook`: add tests for webhook entity.
+* `entity/space`: add tests for space entity.
+* `errors`: add tests for error handler.
+* `entity/content_type`: add test for content type entity.
 
 v0.0.1 (2017-03-20)
 ===

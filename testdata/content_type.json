@@ -1,0 +1,55 @@
+{
+  "name": "ct-name",
+  "description": "ct-description",
+  "fields": [
+    {
+      "id": "field1",
+      "name": "field1-name",
+      "type": "Symbol",
+      "localized": false,
+      "required": true,
+      "disabled": false,
+      "omitted": false,
+      "validations": []
+    },
+    {
+      "id": "field2",
+      "name": "field2-name",
+      "type": "Symbol",
+      "disabled": true,
+      "localized": false,
+      "required": false,
+      "omitted": false,
+      "validations": []
+    }
+  ],
+  "displayField": "field1",
+  "sys": {
+    "id": "63Vgs0BFK0USe4i2mQUGK6",
+    "type": "ContentType",
+    "version": 1,
+    "createdAt": "2017-03-20T21:03:59.364Z",
+    "createdBy": {
+      "sys": {
+        "type": "Link",
+        "linkType": "User",
+        "id": "7aAReMWo8woRiCCd2wFNwB"
+      }
+    },
+    "space": {
+      "sys": {
+        "type": "Link",
+        "linkType": "Space",
+        "id": "q65ipbk62rgw"
+      }
+    },
+    "updatedAt": "2017-03-20T21:03:59.364Z",
+    "updatedBy": {
+      "sys": {
+        "type": "Link",
+        "linkType": "User",
+        "id": "7aAReMWo8woRiCCd2wFNwB"
+      }
+    }
+  }
+}

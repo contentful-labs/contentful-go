@@ -72,6 +72,25 @@ func webhookFromTestData(fileName string) (*Webhook, error) {
 	return &webhook, nil
 }
 
+func contentTypeFromTestData(fileName string) (*ContentType, error) {
+	space, err := spaceFromTestData("space-1.json")
+	if err != nil {
+		return nil, err
+	}
+
+	content := readTestData(fileName)
+	ct := ContentType{
+		c: cma,
+		s: space,
+	}
+	err = json.NewDecoder(strings.NewReader(content)).Decode(&ct)
+	if err != nil {
+		return nil, err
+	}
+
+	return &ct, nil
+}
+
 func setup() {
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fixture := strings.Replace(r.URL.Path, "/", "-", -1)

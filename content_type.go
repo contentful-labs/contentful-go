@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"net/http"
 	"strconv"
 )
 
@@ -44,10 +43,11 @@ func (ct *ContentType) AddField(field *Field) {
 	ct.Fields = append(ct.Fields, field)
 }
 
-func (ct *ContentType) makeSaveReq() (*http.Request, error) {
+// Save the content type to contentful
+func (ct *ContentType) Save() error {
 	bytesArray, err := json.Marshal(ct)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	var path string
@@ -63,21 +63,11 @@ func (ct *ContentType) makeSaveReq() (*http.Request, error) {
 
 	req, err := ct.c.newRequest(method, path, nil, bytes.NewReader(bytesArray))
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	version := strconv.Itoa(ct.Sys.Version)
 	req.Header.Set("X-Contentful-Version", version)
-
-	return req, nil
-}
-
-// Save the content type to contentful
-func (ct *ContentType) Save() error {
-	req, err := ct.makeSaveReq()
-	if err != nil {
-		return err
-	}
 
 	if err = ct.c.do(req, ct); err != nil {
 		return err
