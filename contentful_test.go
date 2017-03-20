@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -15,12 +16,61 @@ import (
 )
 
 var (
-	mux      *http.ServeMux
 	server   *httptest.Server
+	cma      *Contentful
 	c        *Contentful
 	CMAToken = "b4c0n73n7fu1"
 	spaceID  = "id1"
 )
+
+func readTestData(fileName string) string {
+	path := "testdata/" + fileName
+	content, err := ioutil.ReadFile(path)
+	if err != nil {
+		log.Fatal(err)
+		return ""
+	}
+
+	return string(content)
+}
+
+func checkHeaders(req *http.Request, assert *assert.Assertions) {
+	assert.Equal("Bearer "+CMAToken, req.Header.Get("Authorization"))
+	assert.Equal("application/vnd.contentful.management.v1+json", req.Header.Get("Content-Type"))
+}
+
+func spaceFromTestData(fileName string) (*Space, error) {
+	content := readTestData(fileName)
+	space := Space{
+		c: cma,
+	}
+	err := json.NewDecoder(strings.NewReader(content)).Decode(&space)
+	if err != nil {
+		return nil, err
+	}
+
+	return &space, nil
+}
+
+func webhookFromTestData(fileName string) (*Webhook, error) {
+	// get test space
+	space, err := spaceFromTestData("space-1.json")
+	if err != nil {
+		return nil, err
+	}
+
+	content := readTestData(fileName)
+	webhook := Webhook{
+		c: cma,
+		s: space,
+	}
+	err = json.NewDecoder(strings.NewReader(content)).Decode(&webhook)
+	if err != nil {
+		return nil, err
+	}
+
+	return &webhook, nil
+}
 
 func setup() {
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

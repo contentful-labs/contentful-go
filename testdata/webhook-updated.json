@@ -1,0 +1,48 @@
+{
+  "url": "https://www.example.com/test-updated",
+  "httpBasicUsername": "updated-username",
+  "name": "updated-webhook-name",
+  "headers": [
+	{
+	  "key": "header1",
+	  "value": "updated-header1-value"
+	},
+	{
+	  "key": "header2",
+	  "value": "updated-header2-value"
+	}
+  ],
+  "topics": [
+	"Entry.create",
+	"ContentType.create",
+	"Asset.create"
+  ],
+  "sys": {
+	"type": "WebhookDefinition",
+	"id": "7fstd9fZ9T2p3kwD49FxhI",
+	"version": 1,
+	"space": {
+	  "sys": {
+		"type": "Link",
+		"linkType": "Space",
+		"id": "q65ipbk62rgw"
+	  }
+	},
+	"createdBy": {
+	  "sys": {
+		"type": "Link",
+		"linkType": "User",
+		"id": "7aAReMWo8woRiCCd2wFNwB"
+	  }
+	},
+	"createdAt": "2017-03-20T17:52:38Z",
+	"updatedBy": {
+	  "sys": {
+		"type": "Link",
+		"linkType": "User",
+		"id": "7aAReMWo8woRiCCd2wFNwB"
+	  }
+	},
+	"updatedAt": "2017-03-20T17:52:38Z"
+  }
+}
