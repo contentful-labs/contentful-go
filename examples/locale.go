@@ -6,7 +6,7 @@ import (
 	"os/user"
 
 	"github.com/BurntSushi/toml"
-	contentful "github.com/tolgaakyuz/contentful.go"
+	contentful "github.com/tolgaakyuz/contentful-go"
 )
 
 var cma *contentful.Contentful
