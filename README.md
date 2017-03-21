@@ -33,6 +33,10 @@ When activated, sdk client starts to work in verbose mode and try to print as mu
 c.Debug = true
 ```
 
+### Dependencies
+
+`contentful-go` stores its dependencies under `vendor` folder and uses [`godep`](https://github.com/tools/godep) to manage the vendoring process. Dependencies in `vendor` folder will be loaded automatically by [Go 1.6+](https://golang.org/cmd/go/#hdr-Vendor_Directories).
+
 ## Concepts
 
 - [Querying](#querying) - Explains how to issue query requests
