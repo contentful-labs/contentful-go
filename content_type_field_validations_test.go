@@ -52,12 +52,12 @@ func TestFieldValidationRange(t *testing.T) {
 	var err error
 	assert := assert.New(t)
 
+	// between
 	validation := &FieldValidationRange{
 		Min:          60,
 		Max:          100,
 		ErrorMessage: "error message",
 	}
-
 	data, err := json.Marshal(validation)
 	assert.Nil(err)
 	assert.Equal("{\"range\":{\"min\":60,\"max\":100},\"message\":\"error message\"}", string(data))
@@ -67,5 +67,35 @@ func TestFieldValidationRange(t *testing.T) {
 	assert.Nil(err)
 	assert.Equal(float64(60), validationCheck.Min)
 	assert.Equal(float64(100), validationCheck.Max)
+	assert.Equal("error message", validationCheck.ErrorMessage)
+
+	// greater than equal to
+	validation = &FieldValidationRange{
+		Min:          10,
+		ErrorMessage: "error message",
+	}
+	data, err = json.Marshal(validation)
+	assert.Nil(err)
+	assert.Equal("{\"range\":{\"min\":10},\"message\":\"error message\"}", string(data))
+	validationCheck = FieldValidationRange{}
+	err = json.NewDecoder(bytes.NewReader(data)).Decode(&validationCheck)
+	assert.Nil(err)
+	assert.Equal(float64(10), validationCheck.Min)
+	assert.Equal(float64(0), validationCheck.Max)
+	assert.Equal("error message", validationCheck.ErrorMessage)
+
+	// less than equal to
+	validation = &FieldValidationRange{
+		Max:          90,
+		ErrorMessage: "error message",
+	}
+	data, err = json.Marshal(validation)
+	assert.Nil(err)
+	assert.Equal("{\"range\":{\"max\":90},\"message\":\"error message\"}", string(data))
+	validationCheck = FieldValidationRange{}
+	err = json.NewDecoder(bytes.NewReader(data)).Decode(&validationCheck)
+	assert.Nil(err)
+	assert.Equal(float64(90), validationCheck.Max)
+	assert.Equal(float64(0), validationCheck.Min)
 	assert.Equal("error message", validationCheck.ErrorMessage)
 }

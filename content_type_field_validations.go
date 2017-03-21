@@ -57,9 +57,17 @@ func (v *FieldValidationRange) UnmarshalJSON(data []byte) error {
 
 	rangeData := payload["range"].(map[string]interface{})
 
-	v.Min = rangeData["min"].(float64)
-	v.Max = rangeData["max"].(float64)
-	v.ErrorMessage = payload["message"].(string)
+	if val, ok := rangeData["min"].(float64); ok {
+		v.Min = val
+	}
+
+	if val, ok := rangeData["max"].(float64); ok {
+		v.Max = val
+	}
+
+	if val, ok := payload["message"].(string); ok {
+		v.ErrorMessage = val
+	}
 
 	return nil
 }
