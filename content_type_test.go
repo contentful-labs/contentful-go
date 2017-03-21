@@ -61,7 +61,6 @@ func TestContentTypeSaveForCreate(t *testing.T) {
 	// content type
 	ct := space.NewContentType()
 	ct.Name = "ct-name"
-	ct.Type = "ct-type"
 	ct.Description = "ct-description"
 
 	field1 := &Field{
@@ -142,7 +141,6 @@ func TestContentTypeSaveForUpdate(t *testing.T) {
 	assert.Nil(err)
 
 	ct.Name = "ct-name-updated"
-	ct.Type = "ct-type-updated"
 	ct.Description = "ct-description-updated"
 
 	field1 := ct.Fields[0]
@@ -248,19 +246,172 @@ func TestContentTypeFieldRef(t *testing.T) {
 	// content type
 	ct := space.NewContentType()
 	ct.Name = "ct-name"
-	ct.Type = "ct-type"
 	ct.Description = "ct-description"
-
-	field1Validation := &FieldValidation{
-		LinkContentType: []string{linkCt.Sys.ID},
-	}
 
 	field1 := &Field{
 		ID:   "field1",
 		Name: "field1-name",
 		Type: "Link",
-		Validations: []*FieldValidation{
-			field1Validation,
+		Validations: []FieldValidation{
+			FieldValidationLink{
+				LinkContentType: []string{linkCt.Sys.ID},
+			},
+		},
+	}
+
+	ct.Fields = []*Field{field1}
+	ct.DisplayField = field1.ID
+
+	err = ct.Save()
+	assert.Nil(err)
+}
+
+func TestContentTypeFieldArray(t *testing.T) {
+	var err error
+	assert := assert.New(t)
+
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(r.Method, "POST")
+		assert.Equal(r.RequestURI, "/spaces/"+spaceID+"/content_types")
+		checkHeaders(r, assert)
+
+		var payload map[string]interface{}
+		err := json.NewDecoder(r.Body).Decode(&payload)
+		assert.Nil(err)
+
+		fields := payload["fields"].([]interface{})
+		assert.Equal(1, len(fields))
+
+		field1 := fields[0].(map[string]interface{})
+		assert.Equal("Array", field1["type"].(string))
+
+		arrayItemSchema := field1["items"].(map[string]interface{})
+		assert.Equal("Symbol", arrayItemSchema["type"].(string))
+
+		arrayItemSchemaValidations := arrayItemSchema["validations"].([]interface{})
+		validation1 := arrayItemSchemaValidations[0].(map[string]interface{})
+		assert.Equal(true, validation1["unique"].(bool))
+
+		w.WriteHeader(201)
+		fmt.Fprintln(w, string(readTestData("content_type.json")))
+	})
+
+	// test server
+	server := httptest.NewServer(handler)
+	defer server.Close()
+
+	// cma client
+	cma = NewCMA(CMAToken)
+	cma.BaseURL = server.URL
+
+	// test space
+	space, err := spaceFromTestData("space-1.json")
+	assert.Nil(err)
+
+	// content type
+	ct := space.NewContentType()
+	ct.Name = "ct-name"
+	ct.Description = "ct-description"
+
+	field1 := &Field{
+		ID:   "field1",
+		Name: "field1-name",
+		Type: FieldTypeArray,
+		Items: &FieldTypeArrayItem{
+			Type: FieldTypeText,
+			Validations: []FieldValidation{
+				&FieldValidationUnique{
+					Unique: true,
+				},
+			},
+		},
+	}
+
+	ct.Fields = []*Field{field1}
+	ct.DisplayField = field1.ID
+
+	err = ct.Save()
+	assert.Nil(err)
+}
+
+func TestContentTypeFieldValidationRangeUniquePredefinedValues(t *testing.T) {
+	var err error
+	assert := assert.New(t)
+
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(r.Method, "POST")
+		assert.Equal(r.RequestURI, "/spaces/"+spaceID+"/content_types")
+		checkHeaders(r, assert)
+
+		var payload map[string]interface{}
+		err := json.NewDecoder(r.Body).Decode(&payload)
+		assert.Nil(err)
+
+		fields := payload["fields"].([]interface{})
+		assert.Equal(1, len(fields))
+
+		field1 := fields[0].(map[string]interface{})
+		assert.Equal("Integer", field1["type"].(string))
+
+		validations := field1["validations"].([]interface{})
+
+		// unique validation
+		validationUnique := validations[0].(map[string]interface{})
+		assert.Equal(false, validationUnique["unique"].(bool))
+
+		// range validation
+		validationRange := validations[1].(map[string]interface{})
+		rangeValues := validationRange["range"].(map[string]interface{})
+		errorMessage := validationRange["message"].(string)
+		assert.Equal("error message", errorMessage)
+		assert.Equal(float64(20), rangeValues["min"].(float64))
+		assert.Equal(float64(30), rangeValues["max"].(float64))
+
+		// predefined validation
+		validationPredefinedValues := validations[2].(map[string]interface{})
+		predefinedValues := validationPredefinedValues["in"].([]interface{})
+		assert.Equal(3, len(predefinedValues))
+		assert.Equal(float64(20), predefinedValues[0].(float64))
+		assert.Equal(float64(21), predefinedValues[1].(float64))
+		assert.Equal(float64(22), predefinedValues[2].(float64))
+
+		w.WriteHeader(201)
+		fmt.Fprintln(w, string(readTestData("content_type.json")))
+	})
+
+	// test server
+	server := httptest.NewServer(handler)
+	defer server.Close()
+
+	// cma client
+	cma = NewCMA(CMAToken)
+	cma.BaseURL = server.URL
+
+	// test space
+	space, err := spaceFromTestData("space-1.json")
+	assert.Nil(err)
+
+	// content type
+	ct := space.NewContentType()
+	ct.Name = "ct-name"
+	ct.Description = "ct-description"
+
+	field1 := &Field{
+		ID:   "field1",
+		Name: "field1-name",
+		Type: FieldTypeInteger,
+		Validations: []FieldValidation{
+			&FieldValidationUnique{
+				Unique: false,
+			},
+			&FieldValidationRange{
+				Min:          20,
+				Max:          30,
+				ErrorMessage: "error message",
+			},
+			&FieldValidationPredefinedValues{
+				In: []interface{}{20, 21, 22},
+			},
 		},
 	}
 

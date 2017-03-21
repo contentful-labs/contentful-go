@@ -1,10 +1,11 @@
-v0.0.2-rc (TBA)
+v0.0.2 (2017-03-21)
 ===
 * `entity/webhook`: add tests for webhook entity.
 * `entity/space`: add tests for space entity.
 * `errors`: add tests for error handler.
 * `entity/content_type`: add test for content type entity.
 * `entity/content_type`: Field validations added for link type
+* `entity/content_type`: field validations added: Range, PredefinedValues, Unique
 
 v0.0.1 (2017-03-20)
 ===

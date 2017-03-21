@@ -12,36 +12,37 @@ type ContentType struct {
 	c            *Contentful
 	s            *Space
 	Sys          *Sys     `json:"sys"`
-	Type         string   `json:"type,omitempty"`
 	Name         string   `json:"name,omitempty"`
 	Description  string   `json:"description,omitempty"`
 	Fields       []*Field `json:"fields,omitempty"`
 	DisplayField string   `json:"displayField,omitempty"`
 }
 
+const (
+	FieldTypeText    = "Symbol"
+	FieldTypeArray   = "Array"
+	FieldTypeLink    = "Link"
+	FieldTypeInteger = "Integer"
+)
+
 // Field model
 type Field struct {
-	ID          string             `json:"id,omitempty"`
-	Name        string             `json:"name"`
-	Type        string             `json:"type"`
-	Items       *Schema            `json:"items,omitempty"`
-	Required    bool               `json:"required,omitempty"`
-	Localized   bool               `json:"localized,omitempty"`
-	Disabled    bool               `json:"disabled,omitempty"`
-	Omitted     bool               `json:"omitted,omitempty"`
-	Validations []*FieldValidation `json:"validations,omitempty"`
+	ID          string              `json:"id,omitempty"`
+	Name        string              `json:"name"`
+	Type        string              `json:"type"`
+	Items       *FieldTypeArrayItem `json:"items,omitempty"`
+	Required    bool                `json:"required,omitempty"`
+	Localized   bool                `json:"localized,omitempty"`
+	Disabled    bool                `json:"disabled,omitempty"`
+	Omitted     bool                `json:"omitted,omitempty"`
+	Validations []FieldValidation   `json:"validations,omitempty"`
 }
 
-// FieldValidation model
-type FieldValidation struct {
-	LinkContentType []string `json:"linkContentType,omitempty"`
-}
-
-// Schema model
-type Schema struct {
-	Type        string   `json:"type"`
-	Validations []string `json:"validations"`
-	LinkType    string   `json:"linkType,omitempty"`
+// FieldTypeArrayItem model
+type FieldTypeArrayItem struct {
+	Type        string            `json:"type"`
+	Validations []FieldValidation `json:"validations"`
+	LinkType    string            `json:"linkType,omitempty"`
 }
 
 // AddField to the content type
