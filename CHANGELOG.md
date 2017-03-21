@@ -1,7 +1,8 @@
 v0.0.3-rc (TBA)
 ===
-* `entity/content_type`: PredefinedValues validation error message
-* `entity/content_type`: Range validation greater/less than equal to support
+* `entity/content_type`: PredefinedValues validation error message.
+* `entity/content_type`: Range validation greater/less than equal to support.
+* `entity/content_type`: Added: Size validation for content type field.
 
 v0.0.2 (2017-03-21)
 ===

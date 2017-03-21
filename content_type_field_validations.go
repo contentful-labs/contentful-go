@@ -71,3 +71,50 @@ func (v *FieldValidationRange) UnmarshalJSON(data []byte) error {
 
 	return nil
 }
+
+// FieldValidationSize model
+type FieldValidationSize struct {
+	Min          int
+	Max          int
+	ErrorMessage string
+}
+
+// MarshalJSON for custom json marshaling
+func (v *FieldValidationSize) MarshalJSON() ([]byte, error) {
+	type size struct {
+		Min int `json:"min,omitempty"`
+		Max int `json:"max,omitempty"`
+	}
+
+	return json.Marshal(&struct {
+		Size    *size  `json:"size,omitempty"`
+		Message string `json:"message,omitempty"`
+	}{
+		Size:    &size{v.Min, v.Max},
+		Message: v.ErrorMessage,
+	})
+}
+
+// UnmarshalJSON for custom json unmarshaling
+func (v *FieldValidationSize) UnmarshalJSON(data []byte) error {
+	payload := map[string]interface{}{}
+	if err := json.Unmarshal(data, &payload); err != nil {
+		return err
+	}
+
+	sizeData := payload["size"].(map[string]interface{})
+
+	if val, ok := sizeData["min"].(float64); ok {
+		v.Min = int(val)
+	}
+
+	if val, ok := sizeData["max"].(float64); ok {
+		v.Max = int(val)
+	}
+
+	if val, ok := payload["message"].(string); ok {
+		v.ErrorMessage = val
+	}
+
+	return nil
+}

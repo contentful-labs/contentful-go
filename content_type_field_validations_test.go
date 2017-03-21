@@ -99,3 +99,25 @@ func TestFieldValidationRange(t *testing.T) {
 	assert.Equal(float64(0), validationCheck.Min)
 	assert.Equal("error message", validationCheck.ErrorMessage)
 }
+
+func TestFieldValidationSize(t *testing.T) {
+	var err error
+	assert := assert.New(t)
+
+	// between
+	validation := &FieldValidationSize{
+		Min:          4,
+		Max:          6,
+		ErrorMessage: "error message",
+	}
+	data, err := json.Marshal(validation)
+	assert.Nil(err)
+	assert.Equal("{\"size\":{\"min\":4,\"max\":6},\"message\":\"error message\"}", string(data))
+
+	var validationCheck FieldValidationSize
+	err = json.NewDecoder(bytes.NewReader(data)).Decode(&validationCheck)
+	assert.Nil(err)
+	assert.Equal(4, validationCheck.Min)
+	assert.Equal(6, validationCheck.Max)
+	assert.Equal("error message", validationCheck.ErrorMessage)
+}
