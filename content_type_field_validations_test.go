@@ -39,12 +39,13 @@ func TestFieldValidationPredefinedValues(t *testing.T) {
 	assert := assert.New(t)
 
 	validation := &FieldValidationPredefinedValues{
-		In: []interface{}{5, 10, "string", 6.4},
+		In:           []interface{}{5, 10, "string", 6.4},
+		ErrorMessage: "error message",
 	}
 
 	data, err := json.Marshal(validation)
 	assert.Nil(err)
-	assert.Equal("{\"in\":[5,10,\"string\",6.4]}", string(data))
+	assert.Equal("{\"in\":[5,10,\"string\",6.4],\"message\":\"error message\"}", string(data))
 }
 
 func TestFieldValidationRange(t *testing.T) {

@@ -17,7 +17,8 @@ type FieldValidationUnique struct {
 
 // FieldValidationPredefinedValues model
 type FieldValidationPredefinedValues struct {
-	In []interface{} `json:"in,omitempty"`
+	In           []interface{} `json:"in,omitempty"`
+	ErrorMessage string        `json:"message"`
 }
 
 // FieldValidationRange model

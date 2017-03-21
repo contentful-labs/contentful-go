@@ -371,6 +371,7 @@ func TestContentTypeFieldValidationRangeUniquePredefinedValues(t *testing.T) {
 		validationPredefinedValues := validations[2].(map[string]interface{})
 		predefinedValues := validationPredefinedValues["in"].([]interface{})
 		assert.Equal(3, len(predefinedValues))
+		assert.Equal("error message 2", validationPredefinedValues["message"].(string))
 		assert.Equal(float64(20), predefinedValues[0].(float64))
 		assert.Equal(float64(21), predefinedValues[1].(float64))
 		assert.Equal(float64(22), predefinedValues[2].(float64))
@@ -410,7 +411,8 @@ func TestContentTypeFieldValidationRangeUniquePredefinedValues(t *testing.T) {
 				ErrorMessage: "error message",
 			},
 			&FieldValidationPredefinedValues{
-				In: []interface{}{20, 21, 22},
+				In:           []interface{}{20, 21, 22},
+				ErrorMessage: "error message 2",
 			},
 		},
 	}

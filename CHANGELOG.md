@@ -1,3 +1,7 @@
+v0.0.3-rc (TBA)
+===
+* `entity/content_type`: PredefinedValues validation error message
+
 v0.0.2 (2017-03-21)
 ===
 * `entity/webhook`: add tests for webhook entity.
