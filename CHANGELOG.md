@@ -5,6 +5,7 @@ v0.0.3-rc (TBA)
 * `entity/content_type`: Added: Size validation for content type field.
 * packages are vendored with `godep`.
 * `version.go` is added.
+* `entity/content_type`: Added: regex validation for content type field.
 
 v0.0.2 (2017-03-21)
 ===
