@@ -19,10 +19,11 @@ type ContentType struct {
 }
 
 const (
-	FieldTypeText    = "Symbol"
-	FieldTypeArray   = "Array"
-	FieldTypeLink    = "Link"
-	FieldTypeInteger = "Integer"
+	FieldTypeText     = "Symbol"
+	FieldTypeArray    = "Array"
+	FieldTypeLink     = "Link"
+	FieldTypeInteger  = "Integer"
+	FieldTypeLocation = "Location"
 )
 
 // Field model
@@ -30,6 +31,7 @@ type Field struct {
 	ID          string              `json:"id,omitempty"`
 	Name        string              `json:"name"`
 	Type        string              `json:"type"`
+	LinkType    string              `json:"linkType,omitempty"`
 	Items       *FieldTypeArrayItem `json:"items,omitempty"`
 	Required    bool                `json:"required,omitempty"`
 	Localized   bool                `json:"localized,omitempty"`

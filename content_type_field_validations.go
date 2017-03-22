@@ -10,6 +10,104 @@ type FieldValidationLink struct {
 	LinkContentType []string `json:"linkContentType,omitempty"`
 }
 
+const (
+	MimeTypeAttachment   = "attachment"
+	MimeTypePlainText    = "plaintext"
+	MimeTypeImage        = "image"
+	MimeTypeAudio        = "audio"
+	MimeTypeVideo        = "video"
+	MimeTypeRichText     = "richtext"
+	MimeTypePresentation = "presentation"
+	MimeTypeSpreadSheet  = "spreadsheet"
+	MimeTypePDF          = "pdfdocument"
+	MimeTypeArchive      = "archive"
+	MimeTypeCode         = "code"
+	MimeTypeMarkup       = "markup"
+)
+
+// FieldValidationMimeType model
+type FieldValidationMimeType struct {
+	MimeTypes []string `json:"linkMimetypeGroup,omitempty"`
+}
+
+// MinMax model
+type MinMax struct {
+	Min float64 `json:"min,omitempty"`
+	Max float64 `json:"max,omitempty"`
+}
+
+// FieldValidationDimension model
+type FieldValidationDimension struct {
+	Width        *MinMax `json:"width,omitempty"`
+	Height       *MinMax `json:"height,omitempty"`
+	ErrorMessage string  `json:"message,omitempty"`
+}
+
+// MarshalJSON for custom json marshaling
+func (v *FieldValidationDimension) MarshalJSON() ([]byte, error) {
+	type dimension struct {
+		Width  *MinMax `json:"width,omitempty"`
+		Height *MinMax `json:"height,omitempty"`
+	}
+
+	return json.Marshal(&struct {
+		AssetImageDimensions *dimension `json:"assetImageDimensions,omitempty"`
+		Message              string     `json:"message,omitempty"`
+	}{
+		AssetImageDimensions: &dimension{
+			Width:  v.Width,
+			Height: v.Height,
+		},
+		Message: v.ErrorMessage,
+	})
+}
+
+// UnmarshalJSON for custom json unmarshaling
+func (v *FieldValidationDimension) UnmarshalJSON(data []byte) error {
+	payload := map[string]interface{}{}
+	if err := json.Unmarshal(data, &payload); err != nil {
+		return err
+	}
+
+	dimensionData := payload["assetImageDimensions"].(map[string]interface{})
+
+	if width, ok := dimensionData["width"].(map[string]interface{}); ok {
+		v.Width = &MinMax{}
+
+		if min, ok := width["min"].(float64); ok {
+			v.Width.Min = min
+		}
+
+		if max, ok := width["min"].(float64); ok {
+			v.Width.Max = max
+		}
+	}
+
+	if height, ok := dimensionData["height"].(map[string]interface{}); ok {
+		v.Height = &MinMax{}
+
+		if min, ok := height["min"].(float64); ok {
+			v.Height.Min = min
+		}
+
+		if max, ok := height["max"].(float64); ok {
+			v.Height.Max = max
+		}
+	}
+
+	if val, ok := payload["message"].(string); ok {
+		v.ErrorMessage = val
+	}
+
+	return nil
+}
+
+// FieldValidationFileSize model
+type FieldValidationFileSize struct {
+	Size         *MinMax `json:"assetFileSize,omitempty"`
+	ErrorMessage string  `json:"message,omitempty"`
+}
+
 // FieldValidationUnique model
 type FieldValidationUnique struct {
 	Unique bool `json:"unique"`
@@ -23,100 +121,14 @@ type FieldValidationPredefinedValues struct {
 
 // FieldValidationRange model
 type FieldValidationRange struct {
-	Min          float64
-	Max          float64
-	ErrorMessage string
-}
-
-// MarshalJSON for custom json marshaling
-func (v *FieldValidationRange) MarshalJSON() ([]byte, error) {
-	return json.Marshal(&struct {
-		Range *struct {
-			Min float64 `json:"min,omitempty"`
-			Max float64 `json:"max,omitempty"`
-		} `json:"range,omitempty"`
-		Message string `json:"message,omitempty"`
-	}{
-		Range: &struct {
-			Min float64 `json:"min,omitempty"`
-			Max float64 `json:"max,omitempty"`
-		}{
-			Min: v.Min,
-			Max: v.Max,
-		},
-		Message: v.ErrorMessage,
-	})
-}
-
-// UnmarshalJSON for custom json unmarshaling
-func (v *FieldValidationRange) UnmarshalJSON(data []byte) error {
-	payload := map[string]interface{}{}
-	if err := json.Unmarshal(data, &payload); err != nil {
-		return err
-	}
-
-	rangeData := payload["range"].(map[string]interface{})
-
-	if val, ok := rangeData["min"].(float64); ok {
-		v.Min = val
-	}
-
-	if val, ok := rangeData["max"].(float64); ok {
-		v.Max = val
-	}
-
-	if val, ok := payload["message"].(string); ok {
-		v.ErrorMessage = val
-	}
-
-	return nil
+	Range        *MinMax `json:"range,omitempty"`
+	ErrorMessage string  `json:"message,omitempty"`
 }
 
 // FieldValidationSize model
 type FieldValidationSize struct {
-	Min          int
-	Max          int
-	ErrorMessage string
-}
-
-// MarshalJSON for custom json marshaling
-func (v *FieldValidationSize) MarshalJSON() ([]byte, error) {
-	type size struct {
-		Min int `json:"min,omitempty"`
-		Max int `json:"max,omitempty"`
-	}
-
-	return json.Marshal(&struct {
-		Size    *size  `json:"size,omitempty"`
-		Message string `json:"message,omitempty"`
-	}{
-		Size:    &size{v.Min, v.Max},
-		Message: v.ErrorMessage,
-	})
-}
-
-// UnmarshalJSON for custom json unmarshaling
-func (v *FieldValidationSize) UnmarshalJSON(data []byte) error {
-	payload := map[string]interface{}{}
-	if err := json.Unmarshal(data, &payload); err != nil {
-		return err
-	}
-
-	sizeData := payload["size"].(map[string]interface{})
-
-	if val, ok := sizeData["min"].(float64); ok {
-		v.Min = int(val)
-	}
-
-	if val, ok := sizeData["max"].(float64); ok {
-		v.Max = int(val)
-	}
-
-	if val, ok := payload["message"].(string); ok {
-		v.ErrorMessage = val
-	}
-
-	return nil
+	Size         *MinMax `json:"size,omitempty"`
+	ErrorMessage string  `json:"message,omitempty"`
 }
 
 const (
@@ -130,49 +142,14 @@ const (
 	FieldValidationRegexPatternUSZipCode     = `^\d{5}$|^\d{5}-\d{4}$}`
 )
 
+// Regex model
+type Regex struct {
+	Pattern string `json:"pattern,omitempty"`
+	Flags   string `json:"flags,omitempty"`
+}
+
 // FieldValidationRegex model
 type FieldValidationRegex struct {
-	Pattern      string
-	Flags        string
-	ErrorMessage string
-}
-
-// MarshalJSON for custom json marshaling
-func (v *FieldValidationRegex) MarshalJSON() ([]byte, error) {
-	type regex struct {
-		Pattern string `json:"pattern"`
-		Flags   string `json:"flags"`
-	}
-
-	return json.Marshal(&struct {
-		Regexp  *regex `json:"regexp,omitempty"`
-		Message string `json:"message,omitempty"`
-	}{
-		Regexp:  &regex{v.Pattern, v.Flags},
-		Message: v.ErrorMessage,
-	})
-}
-
-// UnmarshalJSON for custom json unmarshaling
-func (v *FieldValidationRegex) UnmarshalJSON(data []byte) error {
-	payload := map[string]interface{}{}
-	if err := json.Unmarshal(data, &payload); err != nil {
-		return err
-	}
-
-	regex := payload["regexp"].(map[string]interface{})
-
-	if val, ok := regex["pattern"].(string); ok {
-		v.Pattern = val
-	}
-
-	if val, ok := regex["flags"].(string); ok {
-		v.Flags = val
-	}
-
-	if val, ok := regex["message"].(string); ok {
-		v.ErrorMessage = val
-	}
-
-	return nil
+	Regex        *Regex `json:"regexp,omitempty"`
+	ErrorMessage string `json:"message,omitempty"`
 }

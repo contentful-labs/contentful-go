@@ -406,13 +406,155 @@ func TestContentTypeFieldValidationRangeUniquePredefinedValues(t *testing.T) {
 				Unique: false,
 			},
 			&FieldValidationRange{
-				Min:          20,
-				Max:          30,
+				Range: &MinMax{
+					Min: 20,
+					Max: 30,
+				},
 				ErrorMessage: "error message",
 			},
 			&FieldValidationPredefinedValues{
 				In:           []interface{}{20, 21, 22},
 				ErrorMessage: "error message 2",
+			},
+		},
+	}
+
+	ct.Fields = []*Field{field1}
+	ct.DisplayField = field1.ID
+
+	err = ct.Save()
+	assert.Nil(err)
+}
+
+func TestContentTypeFieldTypeMedia(t *testing.T) {
+	var err error
+	assert := assert.New(t)
+
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(r.Method, "POST")
+		assert.Equal(r.RequestURI, "/spaces/"+spaceID+"/content_types")
+		checkHeaders(r, assert)
+
+		var payload map[string]interface{}
+		err := json.NewDecoder(r.Body).Decode(&payload)
+		assert.Nil(err)
+
+		fields := payload["fields"].([]interface{})
+		assert.Equal(1, len(fields))
+
+		field1 := fields[0].(map[string]interface{})
+		assert.Equal("Link", field1["type"].(string))
+		assert.Equal("Asset", field1["linkType"].(string))
+
+		validations := field1["validations"].([]interface{})
+
+		// mime type validation
+		validationMimeType := validations[0].(map[string]interface{})
+		linkMimetypeGroup := validationMimeType["linkMimetypeGroup"].([]interface{})
+		assert.Equal(12, len(linkMimetypeGroup))
+		mimetypes := []string{}
+		for _, mimetype := range linkMimetypeGroup {
+			mimetypes = append(mimetypes, mimetype.(string))
+		}
+		assert.Equal(mimetypes, []string{
+			MimeTypeAttachment,
+			MimeTypePlainText,
+			MimeTypeImage,
+			MimeTypeAudio,
+			MimeTypeVideo,
+			MimeTypeRichText,
+			MimeTypePresentation,
+			MimeTypeSpreadSheet,
+			MimeTypePDF,
+			MimeTypeArchive,
+			MimeTypeCode,
+			MimeTypeMarkup,
+		})
+
+		// dimension validation
+		validationDimension := validations[1].(map[string]interface{})
+		errorMessage := validationDimension["message"].(string)
+		assetImageDimensions := validationDimension["assetImageDimensions"].(map[string]interface{})
+		widthData := assetImageDimensions["width"].(map[string]interface{})
+		heightData := assetImageDimensions["height"].(map[string]interface{})
+		widthMin := int(widthData["min"].(float64))
+		heightMax := int(heightData["max"].(float64))
+
+		_, ok := widthData["max"].(float64)
+		assert.False(ok)
+
+		_, ok = heightData["min"].(float64)
+		assert.False(ok)
+
+		assert.Equal("custom error message", errorMessage)
+		assert.Equal(100, widthMin)
+		assert.Equal(300, heightMax)
+
+		// size validation
+		validationSize := validations[2].(map[string]interface{})
+		sizeData := validationSize["assetFileSize"].(map[string]interface{})
+		min := int(sizeData["min"].(float64))
+		max := int(sizeData["max"].(float64))
+		assert.Equal(30, min)
+		assert.Equal(400, max)
+
+		w.WriteHeader(201)
+		fmt.Fprintln(w, string(readTestData("content_type.json")))
+	})
+
+	// test server
+	server := httptest.NewServer(handler)
+	defer server.Close()
+
+	// cma client
+	cma = NewCMA(CMAToken)
+	cma.BaseURL = server.URL
+
+	// test space
+	space, err := spaceFromTestData("space-1.json")
+	assert.Nil(err)
+
+	// content type
+	ct := space.NewContentType()
+	ct.Name = "ct-name"
+	ct.Description = "ct-description"
+
+	field1 := &Field{
+		ID:       "field-id",
+		Name:     "media-field",
+		Type:     FieldTypeLink,
+		LinkType: "Asset",
+		Validations: []FieldValidation{
+			&FieldValidationMimeType{
+				MimeTypes: []string{
+					MimeTypeAttachment,
+					MimeTypePlainText,
+					MimeTypeImage,
+					MimeTypeAudio,
+					MimeTypeVideo,
+					MimeTypeRichText,
+					MimeTypePresentation,
+					MimeTypeSpreadSheet,
+					MimeTypePDF,
+					MimeTypeArchive,
+					MimeTypeCode,
+					MimeTypeMarkup,
+				},
+			},
+			&FieldValidationDimension{
+				Width: &MinMax{
+					Min: 100,
+				},
+				Height: &MinMax{
+					Max: 300,
+				},
+				ErrorMessage: "custom error message",
+			},
+			&FieldValidationFileSize{
+				Size: &MinMax{
+					Min: 30,
+					Max: 400,
+				},
 			},
 		},
 	}
