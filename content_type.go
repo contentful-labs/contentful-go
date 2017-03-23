@@ -19,11 +19,14 @@ type ContentType struct {
 }
 
 const (
-	FieldTypeText     = "Symbol"
+	FieldTypeText     = "Text"
 	FieldTypeArray    = "Array"
 	FieldTypeLink     = "Link"
 	FieldTypeInteger  = "Integer"
 	FieldTypeLocation = "Location"
+	FieldTypeBoolean  = "Boolean"
+	FieldTypeDate     = "Date"
+	FieldTypeObject   = "Object"
 )
 
 // Field model
