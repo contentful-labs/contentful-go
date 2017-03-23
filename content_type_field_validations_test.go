@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -127,5 +128,35 @@ func TestFieldValidationSize(t *testing.T) {
 	assert.Nil(err)
 	assert.Equal(float64(4), validationCheck.Size.Min)
 	assert.Equal(float64(6), validationCheck.Size.Max)
+	assert.Equal("error message", validationCheck.ErrorMessage)
+}
+
+func TestFieldValidationDate(t *testing.T) {
+	var err error
+	assert := assert.New(t)
+
+	layout := "2006-01-02T03:04:05"
+	min := time.Now()
+	max := time.Now()
+
+	minStr := min.Format(layout)
+	maxStr := max.Format(layout)
+
+	validation := &FieldValidationDate{
+		Range: &DateMinMax{
+			Min: min,
+			Max: max,
+		},
+		ErrorMessage: "error message",
+	}
+	data, err := json.Marshal(validation)
+	assert.Nil(err)
+	assert.Equal("{\"dateRange\":{\"min\":\""+minStr+"\",\"max\":\""+maxStr+"\"},\"message\":\"error message\"}", string(data))
+
+	var validationCheck FieldValidationDate
+	err = json.NewDecoder(bytes.NewReader(data)).Decode(&validationCheck)
+	assert.Nil(err)
+	assert.Equal(minStr, validationCheck.Range.Min.Format(layout))
+	assert.Equal(maxStr, validationCheck.Range.Max.Format(layout))
 	assert.Equal("error message", validationCheck.ErrorMessage)
 }

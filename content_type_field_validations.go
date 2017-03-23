@@ -1,6 +1,9 @@
 package contentful
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"time"
+)
 
 // FieldValidation interface
 type FieldValidation interface{}
@@ -34,6 +37,12 @@ type FieldValidationMimeType struct {
 type MinMax struct {
 	Min float64 `json:"min,omitempty"`
 	Max float64 `json:"max,omitempty"`
+}
+
+// DateMinMax model
+type DateMinMax struct {
+	Min time.Time `json:"min,omitempty"`
+	Max time.Time `json:"max,omitempty"`
 }
 
 // FieldValidationDimension model
@@ -123,6 +132,67 @@ type FieldValidationPredefinedValues struct {
 type FieldValidationRange struct {
 	Range        *MinMax `json:"range,omitempty"`
 	ErrorMessage string  `json:"message,omitempty"`
+}
+
+// FieldValidationDate model
+type FieldValidationDate struct {
+	Range        *DateMinMax `json:"dateRange,omitempty"`
+	ErrorMessage string      `json:"message,omitempty"`
+}
+
+// MarshalJSON for custom json marshaling
+func (v *FieldValidationDate) MarshalJSON() ([]byte, error) {
+	type dateRange struct {
+		Min string `json:"min,omitempty"`
+		Max string `json:"max,omitempty"`
+	}
+
+	return json.Marshal(&struct {
+		DateRange *dateRange `json:"dateRange,omitempty"`
+		Message   string     `json:"message,omitempty"`
+	}{
+		DateRange: &dateRange{
+			Min: v.Range.Max.Format("2006-01-02T03:04:05"),
+			Max: v.Range.Max.Format("2006-01-02T03:04:05"),
+		},
+		Message: v.ErrorMessage,
+	})
+}
+
+// UnmarshalJSON for custom json unmarshaling
+func (v *FieldValidationDate) UnmarshalJSON(data []byte) error {
+	payload := map[string]interface{}{}
+	if err := json.Unmarshal(data, &payload); err != nil {
+		return err
+	}
+
+	dateRangeData := payload["dateRange"].(map[string]interface{})
+
+	v.Range = &DateMinMax{}
+
+	if min, ok := dateRangeData["min"].(string); ok {
+		minDate, err := time.Parse("2006-01-02T03:04:05", min)
+		if err != nil {
+			return err
+		}
+
+		v.Range.Min = minDate
+	}
+
+	if max, ok := dateRangeData["max"].(string); ok {
+		maxDate, err := time.Parse("2006-01-02T03:04:05", max)
+		if err != nil {
+			return err
+		}
+
+		v.Range.Max = maxDate
+	}
+
+	if val, ok := payload["message"].(string); ok {
+		v.ErrorMessage = val
+	}
+
+	return nil
 }
 
 // FieldValidationSize model

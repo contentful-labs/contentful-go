@@ -1,5 +1,6 @@
 v0.0.4-rc (TBA)
 ===
+* [Added] `Date` validation
 
 
 v0.0.3 (2017-03-22)
