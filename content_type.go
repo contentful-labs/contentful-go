@@ -7,6 +7,7 @@ import (
 	"strconv"
 )
 
+// ContentTypesService service
 type ContentTypesService service
 
 // ContentType model

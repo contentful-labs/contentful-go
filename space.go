@@ -17,6 +17,17 @@ type Space struct {
 	DefaultLocale string `json:"defaultLocale,omitempty"`
 }
 
+// MarshalJSON for custom json marshaling
+func (space *Space) MarshalJSON() ([]byte, error) {
+	return json.Marshal(&struct {
+		Name          string `json:"name,omitempty"`
+		DefaultLocale string `json:"defaultLocale,omitempty"`
+	}{
+		Name:          space.Name,
+		DefaultLocale: space.DefaultLocale,
+	})
+}
+
 // GetVersion returns entity version
 func (space *Space) GetVersion() int {
 	version := 1

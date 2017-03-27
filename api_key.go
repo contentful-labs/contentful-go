@@ -13,7 +13,7 @@ type APIKeyService service
 // APIKey model
 type APIKey struct {
 	Sys           *Sys            `json:"sys,omitempty"`
-	Name          string          `json:"name"`
+	Name          string          `json:"name,omitempty"`
 	Description   string          `json:"description,omitempty"`
 	AccessToken   string          `json:"accessToken,omitempty"`
 	Policies      []*APIKeyPolicy `json:"policies,omitempty"`
@@ -32,13 +32,13 @@ type PreviewAPIKey struct {
 }
 
 // MarshalJSON for custom json marshaling
-func (a *APIKey) MarshalJSON() ([]byte, error) {
+func (apiKey *APIKey) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&struct {
 		Name        string `json:"name"`
 		Description string `json:"description,omitempty"`
 	}{
-		Name:        a.Name,
-		Description: a.Description,
+		Name:        apiKey.Name,
+		Description: apiKey.Description,
 	})
 }
 
