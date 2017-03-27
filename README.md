@@ -42,33 +42,12 @@ c.Debug = true
 - [Querying](#querying) - Explains how to issue query requests
 - [Collections](#collections) - General rules for multi resource endpoints, paginating,  type casting etc.
 
-## Querying
-
-### Geting/Querying entries
-
-Please check [query.go](https://github.com/tolgaakyuz/contentful.go/blob/master/contentful/query.go) to see all the query options
-
-```go
-query := c.Space.Entries()
-query.Query
-    .ContentType("content_type_id")
-    .Select([]string{"field1, field2"})
-    .Equal("fields.field3", "cat")
-    .NotEqual("fields.field3", "dog")
-    .Exists("fields.field4")
-
-entries, err := query.All()
-if err != nil {
-  fmt.Println(err)
-}
-```
-
 ### Collections
 
 All the endpoints which return multiple entity objects are wrapped around `Collection` struct. The main goal of `Collection` is to give you the ability to cast api results into entity objects such as `Space`. `Collection` struct exposes the necessary converters such as `toSpace()`. The following example gets all spaces for the given account:
 
 ```go
-col, err := c.GetSpaces().Next()
+col, err := c.Spaces.List().Next()
 if err != nil {
   log.Fatal(err)
 }
@@ -87,7 +66,7 @@ fmt.Println(col.Limit)
 You can also call `Collection.Next()` to paginate or nagivate through the collection:
 
 ```go
-col := c.GetSpaces()
+col := c.Spaces.List()
 
 while col.HasMore() {
   _, err := col.Next()
@@ -102,7 +81,7 @@ while col.HasMore() {
 In order to change the pagination limit of collection, you can initialize `Collection` struct with a option parameter:
 
 ```go
-col, err := c.GetSpaces(&CollectionOption{
+col, err := c.Spaces.List(&CollectionOption{
   Limit; 60,
 })
 

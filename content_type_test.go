@@ -54,15 +54,6 @@ func TestContentTypeSaveForCreate(t *testing.T) {
 	cma = NewCMA(CMAToken)
 	cma.BaseURL = server.URL
 
-	// test space
-	space, err := spaceFromTestData("space-1.json")
-	assert.Nil(err)
-
-	// content type
-	ct := space.NewContentType()
-	ct.Name = "ct-name"
-	ct.Description = "ct-description"
-
 	field1 := &Field{
 		ID:       "field1",
 		Name:     "field1-name",
@@ -77,10 +68,14 @@ func TestContentTypeSaveForCreate(t *testing.T) {
 		Disabled: true,
 	}
 
-	ct.Fields = []*Field{field1, field2}
-	ct.DisplayField = field1.ID
+	ct := &ContentType{
+		Name:         "ct-name",
+		Description:  "ct-description",
+		Fields:       []*Field{field1, field2},
+		DisplayField: field1.ID,
+	}
 
-	err = ct.Save()
+	err = cma.ContentTypes.Upsert("id1", ct)
 	assert.Nil(err)
 	assert.Equal("63Vgs0BFK0USe4i2mQUGK6", ct.Sys.ID)
 	assert.Equal("ct-name", ct.Name)
@@ -162,7 +157,7 @@ func TestContentTypeSaveForUpdate(t *testing.T) {
 	ct.Fields = append(ct.Fields, field3)
 	ct.DisplayField = ct.Fields[2].ID
 
-	err = ct.Save()
+	cma.ContentTypes.Upsert("id1", ct)
 	assert.Nil(err)
 	assert.Equal("63Vgs0BFK0USe4i2mQUGK6", ct.Sys.ID)
 	assert.Equal("ct-name-updated", ct.Name)
@@ -194,7 +189,8 @@ func TestContentTypeDelete(t *testing.T) {
 	ct, err := contentTypeFromTestData("content_type.json")
 	assert.Nil(err)
 
-	err = ct.Delete()
+	// delete content type
+	err = cma.ContentTypes.Delete("id1", ct)
 	assert.Nil(err)
 }
 
@@ -235,18 +231,9 @@ func TestContentTypeFieldRef(t *testing.T) {
 	cma = NewCMA(CMAToken)
 	cma.BaseURL = server.URL
 
-	// test space
-	space, err := spaceFromTestData("space-1.json")
-	assert.Nil(err)
-
 	// test content type
 	linkCt, err := contentTypeFromTestData("content_type.json")
 	assert.Nil(err)
-
-	// content type
-	ct := space.NewContentType()
-	ct.Name = "ct-name"
-	ct.Description = "ct-description"
 
 	field1 := &Field{
 		ID:   "field1",
@@ -259,10 +246,14 @@ func TestContentTypeFieldRef(t *testing.T) {
 		},
 	}
 
-	ct.Fields = []*Field{field1}
-	ct.DisplayField = field1.ID
+	ct := &ContentType{
+		Name:         "ct-name",
+		Description:  "ct-description",
+		Fields:       []*Field{field1},
+		DisplayField: field1.ID,
+	}
 
-	err = ct.Save()
+	err = cma.ContentTypes.Upsert("id1", ct)
 	assert.Nil(err)
 }
 
@@ -286,7 +277,7 @@ func TestContentTypeFieldArray(t *testing.T) {
 		assert.Equal("Array", field1["type"].(string))
 
 		arrayItemSchema := field1["items"].(map[string]interface{})
-		assert.Equal("Symbol", arrayItemSchema["type"].(string))
+		assert.Equal("Text", arrayItemSchema["type"].(string))
 
 		arrayItemSchemaValidations := arrayItemSchema["validations"].([]interface{})
 		validation1 := arrayItemSchemaValidations[0].(map[string]interface{})
@@ -304,15 +295,6 @@ func TestContentTypeFieldArray(t *testing.T) {
 	cma = NewCMA(CMAToken)
 	cma.BaseURL = server.URL
 
-	// test space
-	space, err := spaceFromTestData("space-1.json")
-	assert.Nil(err)
-
-	// content type
-	ct := space.NewContentType()
-	ct.Name = "ct-name"
-	ct.Description = "ct-description"
-
 	field1 := &Field{
 		ID:   "field1",
 		Name: "field1-name",
@@ -327,10 +309,14 @@ func TestContentTypeFieldArray(t *testing.T) {
 		},
 	}
 
-	ct.Fields = []*Field{field1}
-	ct.DisplayField = field1.ID
+	ct := &ContentType{
+		Name:         "ct-name",
+		Description:  "ct-description",
+		Fields:       []*Field{field1},
+		DisplayField: field1.ID,
+	}
 
-	err = ct.Save()
+	err = cma.ContentTypes.Upsert("id1", ct)
 	assert.Nil(err)
 }
 
@@ -388,15 +374,6 @@ func TestContentTypeFieldValidationRangeUniquePredefinedValues(t *testing.T) {
 	cma = NewCMA(CMAToken)
 	cma.BaseURL = server.URL
 
-	// test space
-	space, err := spaceFromTestData("space-1.json")
-	assert.Nil(err)
-
-	// content type
-	ct := space.NewContentType()
-	ct.Name = "ct-name"
-	ct.Description = "ct-description"
-
 	field1 := &Field{
 		ID:   "field1",
 		Name: "field1-name",
@@ -419,10 +396,14 @@ func TestContentTypeFieldValidationRangeUniquePredefinedValues(t *testing.T) {
 		},
 	}
 
-	ct.Fields = []*Field{field1}
-	ct.DisplayField = field1.ID
+	ct := &ContentType{
+		Name:         "ct-name",
+		Description:  "ct-description",
+		Fields:       []*Field{field1},
+		DisplayField: field1.ID,
+	}
 
-	err = ct.Save()
+	err = cma.ContentTypes.Upsert("id1", ct)
 	assert.Nil(err)
 }
 
@@ -510,15 +491,6 @@ func TestContentTypeFieldTypeMedia(t *testing.T) {
 	cma = NewCMA(CMAToken)
 	cma.BaseURL = server.URL
 
-	// test space
-	space, err := spaceFromTestData("space-1.json")
-	assert.Nil(err)
-
-	// content type
-	ct := space.NewContentType()
-	ct.Name = "ct-name"
-	ct.Description = "ct-description"
-
 	field1 := &Field{
 		ID:       "field-id",
 		Name:     "media-field",
@@ -559,9 +531,13 @@ func TestContentTypeFieldTypeMedia(t *testing.T) {
 		},
 	}
 
-	ct.Fields = []*Field{field1}
-	ct.DisplayField = field1.ID
+	ct := &ContentType{
+		Name:         "ct-name",
+		Description:  "ct-description",
+		Fields:       []*Field{field1},
+		DisplayField: field1.ID,
+	}
 
-	err = ct.Save()
+	err = cma.ContentTypes.Upsert("id1", ct)
 	assert.Nil(err)
 }

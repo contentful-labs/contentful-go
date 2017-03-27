@@ -36,10 +36,12 @@ func TestSpaceSaveForCreate(t *testing.T) {
 	cma = NewCMA(CMAToken)
 	cma.BaseURL = server.URL
 
-	space := cma.NewSpace()
-	space.Name = "new space"
-	space.DefaultLocale = "en"
-	err := space.Save()
+	space := &Space{
+		Name:          "new space",
+		DefaultLocale: "en",
+	}
+
+	err := cma.Spaces.Upsert(space)
 	assert.Nil(err)
 	assert.Equal("newspace", space.Sys.ID)
 	assert.Equal("new space", space.Name)
@@ -78,7 +80,8 @@ func TestSpaceSaveForUpdate(t *testing.T) {
 
 	space.Name = "changed-space-name"
 	space.DefaultLocale = "de"
-	err = space.Save()
+
+	err = cma.Spaces.Upsert(space)
 	assert.Nil(err)
 	assert.Equal("changed-space-name", space.Name)
 	assert.Equal("de", space.DefaultLocale)
@@ -108,6 +111,6 @@ func TestSpaceDelete(t *testing.T) {
 	space, err := spaceFromTestData("spaces-" + spaceID + ".json")
 	assert.Nil(err)
 
-	err = space.Delete()
+	err = cma.Spaces.Delete(space)
 	assert.Nil(err)
 }

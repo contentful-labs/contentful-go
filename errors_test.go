@@ -27,7 +27,7 @@ func TestNotFoundErrorResponse(t *testing.T) {
 	cma.BaseURL = server.URL
 
 	// test space
-	_, err = cma.GetSpace("unknown-space-id")
+	_, err = cma.Spaces.Get("unknown-space-id")
 	assert.NotNil(err)
 	_, ok := err.(NotFoundError)
 	assert.Equal(true, ok)

@@ -34,26 +34,27 @@ func main() {
 	cma = contentful.NewCMA(config.CMAToken)
 
 	getSpaces()
-	deleteAllSpaces()
+	// deleteAllSpaces()
 }
 
 func getSpaces() []*contentful.Space {
-	collection, err := cma.GetSpaces().Next()
+	collection, err := cma.Spaces.List().Next()
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	spaces := collection.ToSpace()
 	for _, space := range spaces {
-		fmt.Println(space.ID(), space.Name)
+		fmt.Println(space.Sys.ID, space.Name)
 	}
 
 	return spaces
 }
 
 func getSpace() *contentful.Space {
-	spaceID := getSpaces()[0].ID()
+	spaceID := getSpaces()[0].Sys.ID
 
-	space, err := cma.GetSpace(spaceID)
+	space, err := cma.Spaces.Get(spaceID)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -64,7 +65,7 @@ func getSpace() *contentful.Space {
 func editSpace() {
 	space := getSpace()
 	space.Name = "modified"
-	err := space.Save()
+	err := cma.Spaces.Upsert(space)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -72,20 +73,20 @@ func editSpace() {
 
 func deleteSpace() {
 	space := getSpace()
-	err := space.Delete()
+	err := cma.Spaces.Delete(space)
 	if err != nil {
 		log.Fatal(err)
 	}
 }
 
 func deleteAllSpaces() {
-	collection, err := cma.GetSpaces().Next()
+	collection, err := cma.Spaces.List().Next()
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	for _, space := range collection.ToSpace() {
-		err := space.Delete()
+		err := cma.Spaces.Delete(space)
 		if err != nil {
 			log.Fatal(err)
 		}

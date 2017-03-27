@@ -15,7 +15,6 @@ type CollectionOptions struct {
 type Collection struct {
 	Query
 	c     *Contentful
-	s     *Space
 	req   *http.Request
 	page  uint16
 	Sys   *Sys          `json:"sys"`
@@ -67,11 +66,6 @@ func (col *Collection) ToContentType() []*ContentType {
 	byteArray, _ := json.Marshal(col.Items)
 	json.NewDecoder(bytes.NewReader(byteArray)).Decode(&contentTypes)
 
-	for _, contentType := range contentTypes {
-		contentType.s = col.s
-		contentType.c = col.c
-	}
-
 	return contentTypes
 }
 
@@ -81,10 +75,6 @@ func (col *Collection) ToSpace() []*Space {
 
 	byteArray, _ := json.Marshal(col.Items)
 	json.NewDecoder(bytes.NewReader(byteArray)).Decode(&spaces)
-
-	for _, space := range spaces {
-		space.c = col.c
-	}
 
 	return spaces
 }
@@ -96,11 +86,6 @@ func (col *Collection) ToLocale() []*Locale {
 	byteArray, _ := json.Marshal(col.Items)
 	json.NewDecoder(bytes.NewReader(byteArray)).Decode(&locales)
 
-	for _, locale := range locales {
-		locale.s = col.s
-		locale.c = col.c
-	}
-
 	return locales
 }
 
@@ -108,12 +93,8 @@ func (col *Collection) ToLocale() []*Locale {
 func (col *Collection) ToAsset() []*Asset {
 	var assets []*Asset
 
-	for _, rawAsset := range col.Items {
-		asset, _ := newAssetFromAPIResponse(rawAsset.(map[string]interface{}), "en-US")
-		asset.s = col.s
-		asset.c = col.c
-		assets = append(assets, asset)
-	}
+	byteArray, _ := json.Marshal(col.Items)
+	json.NewDecoder(bytes.NewReader(byteArray)).Decode(&assets)
 
 	return assets
 }
@@ -125,11 +106,6 @@ func (col *Collection) ToAPIKey() []*APIKey {
 	byteArray, _ := json.Marshal(col.Items)
 	json.NewDecoder(bytes.NewReader(byteArray)).Decode(&apiKeys)
 
-	for _, apiKey := range apiKeys {
-		apiKey.c = col.c
-		apiKey.s = col.s
-	}
-
 	return apiKeys
 }
 
@@ -139,11 +115,6 @@ func (col *Collection) ToWebhook() []*Webhook {
 
 	byteArray, _ := json.Marshal(col.Items)
 	json.NewDecoder(bytes.NewReader(byteArray)).Decode(&webhooks)
-
-	for _, webhook := range webhooks {
-		webhook.c = col.c
-		webhook.s = col.s
-	}
 
 	return webhooks
 }

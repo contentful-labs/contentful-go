@@ -41,9 +41,8 @@ func checkHeaders(req *http.Request, assert *assert.Assertions) {
 
 func spaceFromTestData(fileName string) (*Space, error) {
 	content := readTestData(fileName)
-	space := Space{
-		c: cma,
-	}
+
+	var space Space
 	err := json.NewDecoder(strings.NewReader(content)).Decode(&space)
 	if err != nil {
 		return nil, err
@@ -53,18 +52,10 @@ func spaceFromTestData(fileName string) (*Space, error) {
 }
 
 func webhookFromTestData(fileName string) (*Webhook, error) {
-	// get test space
-	space, err := spaceFromTestData("space-1.json")
-	if err != nil {
-		return nil, err
-	}
-
 	content := readTestData(fileName)
-	webhook := Webhook{
-		c: cma,
-		s: space,
-	}
-	err = json.NewDecoder(strings.NewReader(content)).Decode(&webhook)
+
+	var webhook Webhook
+	err := json.NewDecoder(strings.NewReader(content)).Decode(&webhook)
 	if err != nil {
 		return nil, err
 	}
@@ -73,17 +64,10 @@ func webhookFromTestData(fileName string) (*Webhook, error) {
 }
 
 func contentTypeFromTestData(fileName string) (*ContentType, error) {
-	space, err := spaceFromTestData("space-1.json")
-	if err != nil {
-		return nil, err
-	}
-
 	content := readTestData(fileName)
-	ct := ContentType{
-		c: cma,
-		s: space,
-	}
-	err = json.NewDecoder(strings.NewReader(content)).Decode(&ct)
+
+	var ct ContentType
+	err := json.NewDecoder(strings.NewReader(content)).Decode(&ct)
 	if err != nil {
 		return nil, err
 	}
@@ -226,14 +210,13 @@ func TestGetSpace(t *testing.T) {
 
 	assert := assert.New(t)
 
-	space, err := c.GetSpace(spaceID)
+	space, err := c.Spaces.Get(spaceID)
 	if err != nil {
 		assert.Fail(err.Error())
 	}
 
 	assert.Equal("Space", space.Sys.Type)
 	assert.Equal("id1", space.Sys.ID)
-	assert.Equal("id1", space.ID())
 	assert.Equal("Contentful Example API", space.Name)
 }
 
@@ -243,7 +226,7 @@ func TestGetSpaces(t *testing.T) {
 
 	assert := assert.New(t)
 
-	col, err := c.GetSpaces().Next()
+	col, err := c.Spaces.List().Next()
 	if err != nil {
 		assert.Fail(err.Error())
 	}
@@ -251,6 +234,5 @@ func TestGetSpaces(t *testing.T) {
 
 	assert.Equal("Space", spaces[0].Sys.Type)
 	assert.Equal("id1", spaces[0].Sys.ID)
-	assert.Equal("id1", spaces[0].ID())
 	assert.Equal("Contentful Example API", spaces[0].Name)
 }

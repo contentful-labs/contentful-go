@@ -55,32 +55,28 @@ func TestWebhookSaveForCreate(t *testing.T) {
 	cma = NewCMA(CMAToken)
 	cma.BaseURL = server.URL
 
-	// test space
-	space, err := spaceFromTestData("space-1.json")
-	assert.Nil(err)
-
-	// webhook
-	webhook := space.NewWebhook()
-	webhook.Name = "webhook-name"
-	webhook.URL = "https://www.example.com/test"
-	webhook.Topics = []string{
-		"Entry.create",
-		"ContentType.create",
-	}
-	webhook.HTTPBasicUsername = "username"
-	webhook.HTTPBasicPassword = "password"
-	webhook.Headers = []*WebhookHeader{
-		&WebhookHeader{
-			Key:   "header1",
-			Value: "header1-value",
+	webhook := &Webhook{
+		Name: "webhook-name",
+		URL:  "https://www.example.com/test",
+		Topics: []string{
+			"Entry.create",
+			"ContentType.create",
 		},
-		&WebhookHeader{
-			Key:   "header2",
-			Value: "header2-value",
+		HTTPBasicUsername: "username",
+		HTTPBasicPassword: "password",
+		Headers: []*WebhookHeader{
+			&WebhookHeader{
+				Key:   "header1",
+				Value: "header1-value",
+			},
+			&WebhookHeader{
+				Key:   "header2",
+				Value: "header2-value",
+			},
 		},
 	}
 
-	err = webhook.Save()
+	err = cma.Webhooks.Upsert(spaceID, webhook)
 	assert.Nil(err)
 	assert.Equal("7fstd9fZ9T2p3kwD49FxhI", webhook.Sys.ID)
 	assert.Equal("webhook-name", webhook.Name)
@@ -136,6 +132,7 @@ func TestWebhookSaveForUpdate(t *testing.T) {
 	// test webhook
 	webhook, err := webhookFromTestData("webhook.json")
 	assert.Nil(err)
+
 	webhook.Name = "updated-webhook-name"
 	webhook.URL = "https://www.example.com/test-updated"
 	webhook.Topics = []string{
@@ -156,7 +153,7 @@ func TestWebhookSaveForUpdate(t *testing.T) {
 		},
 	}
 
-	err = webhook.Save()
+	err = cma.Webhooks.Upsert(spaceID, webhook)
 	assert.Nil(err)
 	assert.Equal("7fstd9fZ9T2p3kwD49FxhI", webhook.Sys.ID)
 	assert.Equal(1, webhook.Sys.Version)
@@ -188,6 +185,6 @@ func TestWebhookDelete(t *testing.T) {
 	webhook, err := webhookFromTestData("webhook.json")
 	assert.Nil(err)
 
-	err = webhook.Delete()
+	err = cma.Webhooks.Delete(spaceID, webhook)
 	assert.Nil(err)
 }

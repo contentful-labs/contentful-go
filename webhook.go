@@ -3,13 +3,15 @@ package contentful
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"strconv"
 )
 
+// WebhooksService service
+type WebhooksService service
+
 // Webhook model
 type Webhook struct {
-	c                 *Contentful
-	s                 *Space
 	Sys               *Sys             `json:"sys,omitempty"`
 	Name              string           `json:"name,omitempty"`
 	URL               string           `json:"url,omitempty"`
@@ -25,9 +27,54 @@ type WebhookHeader struct {
 	Value string `json:"value"`
 }
 
-// Save the webhook
-func (wh *Webhook) Save() error {
-	bytesArray, err := json.Marshal(wh)
+// GetVersion returns entity version
+func (webhook *Webhook) GetVersion() int {
+	version := 1
+	if webhook.Sys != nil {
+		version = webhook.Sys.Version
+	}
+
+	return version
+}
+
+// List returns webhooks collection
+func (service *WebhooksService) List(spaceID string) *Collection {
+	path := fmt.Sprintf("/spaces/%s/webhook_definitions", spaceID)
+	method := "GET"
+
+	req, err := service.c.newRequest(method, path, nil, nil)
+	if err != nil {
+		return &Collection{}
+	}
+
+	col := NewCollection(&CollectionOptions{})
+	col.c = service.c
+	col.req = req
+
+	return col
+}
+
+// Get returns a single webhook entity
+func (service *WebhooksService) Get(spaceID, webhookID string) (*Webhook, error) {
+	path := fmt.Sprintf("/spaces/%s/webhook_definitions/%s", spaceID, webhookID)
+	method := "GET"
+
+	req, err := service.c.newRequest(method, path, nil, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var webhook Webhook
+	if err := service.c.do(req, &webhook); err != nil {
+		return nil, err
+	}
+
+	return &webhook, nil
+}
+
+// Upsert updates or creates a new entity
+func (service *WebhooksService) Upsert(spaceID string, webhook *Webhook) error {
+	bytesArray, err := json.Marshal(webhook)
 	if err != nil {
 		return err
 	}
@@ -35,23 +82,22 @@ func (wh *Webhook) Save() error {
 	var path string
 	var method string
 
-	if wh.Sys.CreatedAt != "" {
-		path = "/spaces/" + wh.s.ID() + "/webhook_definitions/" + wh.Sys.ID
+	if webhook.Sys != nil && webhook.Sys.CreatedAt != "" {
+		path = fmt.Sprintf("/spaces/%s/webhook_definitions/%s", spaceID, webhook.Sys.ID)
 		method = "PUT"
 	} else {
-		path = "/spaces/" + wh.s.ID() + "/webhook_definitions"
+		path = fmt.Sprintf("/spaces/%s/webhook_definitions", spaceID)
 		method = "POST"
 	}
 
-	req, err := wh.c.newRequest(method, path, nil, bytes.NewReader(bytesArray))
+	req, err := service.c.newRequest(method, path, nil, bytes.NewReader(bytesArray))
 	if err != nil {
 		return err
 	}
 
-	version := strconv.Itoa(wh.Sys.Version)
-	req.Header.Set("X-Contentful-Version", version)
+	req.Header.Set("X-Contentful-Version", strconv.Itoa(webhook.GetVersion()))
 
-	if ok := wh.c.do(req, wh); ok != nil {
+	if ok := service.c.do(req, webhook); ok != nil {
 		return ok
 	}
 
@@ -59,19 +105,19 @@ func (wh *Webhook) Save() error {
 }
 
 // Delete the webhook
-func (wh *Webhook) Delete() error {
-	path := "/spaces/" + wh.s.ID() + "/webhook_definitions/" + wh.Sys.ID
+func (service *WebhooksService) Delete(spaceID string, webhook *Webhook) error {
+	path := fmt.Sprintf("/spaces/%s/webhook_definitions/%s", spaceID, webhook.Sys.ID)
 	method := "DELETE"
 
-	req, err := wh.c.newRequest(method, path, nil, nil)
+	req, err := service.c.newRequest(method, path, nil, nil)
 	if err != nil {
 		return err
 	}
 
-	version := strconv.Itoa(wh.Sys.Version)
+	version := strconv.Itoa(webhook.Sys.Version)
 	req.Header.Set("X-Contentful-Version", version)
 
-	if err = wh.c.do(req, nil); err != nil {
+	if err = service.c.do(req, nil); err != nil {
 		return err
 	}
 

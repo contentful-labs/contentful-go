@@ -3,81 +3,117 @@ package contentful
 import (
 	"bytes"
 	"encoding/json"
-	"net/http"
+	"fmt"
 	"strconv"
 )
 
+// LocalesService service
+type LocalesService service
+
 // Locale model
 type Locale struct {
-	c            *Contentful
-	s            *Space
-	Sys          *Sys   `json:"sys"`
-	Name         string `json:"name"`
-	Code         string `json:"code"`
-	FallbackCode string `json:"fallbackCode"`
-	Default      bool   `json:"default"`
+	Sys          *Sys   `json:"sys,omitempty"`
+	Name         string `json:"name,omitempty"`
+	Code         string `json:"code,omitempty"`
+	FallbackCode string `json:"fallbackCode,omitempty"`
+	Default      bool   `json:"default,omitempty"`
 	Optional     bool   `json:"optional,omitempty"`
 	CDA          bool   `json:"contentDeliveryApi,omitempty"`
 	CMA          bool   `json:"contentManagementApi,omitempty"`
 }
 
-// Save saved the locale in given space
-func (l *Locale) Save() error {
-	req, err := l.getSaveReq()
+// GetVersion returns entity version
+func (locale *Locale) GetVersion() int {
+	version := 1
+	if locale.Sys != nil {
+		version = locale.Sys.Version
+	}
+
+	return version
+}
+
+// List returns a locales collection
+func (service *LocalesService) List(spaceID string) *Collection {
+	path := fmt.Sprintf("/spaces/%s/locales", spaceID)
+	method := "GET"
+
+	req, err := service.c.newRequest(method, path, nil, nil)
+	if err != nil {
+		return &Collection{}
+	}
+
+	col := NewCollection(&CollectionOptions{})
+	col.c = service.c
+	col.req = req
+
+	return col
+}
+
+// Get returns a single locale entity
+func (service *LocalesService) Get(spaceID, localeID string) (*Locale, error) {
+	path := fmt.Sprintf("/spaces/%s/locales/%s", spaceID, localeID)
+	method := "GET"
+
+	req, err := service.c.newRequest(method, path, nil, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var locale Locale
+	if err := service.c.do(req, &locale); err != nil {
+		return nil, err
+	}
+
+	return &locale, nil
+}
+
+// Delete the locale
+func (service *LocalesService) Delete(spaceID string, locale *Locale) error {
+	path := fmt.Sprintf("/spaces/%s/locales/%s", spaceID, locale.Sys.ID)
+	method := "DELETE"
+
+	req, err := service.c.newRequest(method, path, nil, nil)
 	if err != nil {
 		return err
 	}
 
-	if ok := l.c.do(req, l); ok != nil {
-		return ok
+	version := strconv.Itoa(locale.Sys.Version)
+	req.Header.Set("X-Contentful-Version", version)
+
+	if err = service.c.do(req, nil); err != nil {
+		return err
 	}
 
 	return nil
 }
 
-func (l *Locale) getSaveReq() (*http.Request, error) {
-	bytesArray, err := json.Marshal(l)
+// Upsert updates or creates a new locale entity
+func (service *LocalesService) Upsert(spaceID string, locale *Locale) error {
+	bytesArray, err := json.Marshal(locale)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	var path string
 	var method string
 
-	if l.Sys.CreatedAt != "" {
-		path = "/spaces/" + l.s.ID() + "/locales/" + l.Sys.ID
+	if locale.Sys.CreatedAt != "" {
+		path = fmt.Sprintf("/spaces/%s/locales/%s", spaceID, locale.Sys.ID)
 		method = "PUT"
 	} else {
-		path = "/spaces/" + l.s.ID() + "/locales"
+		path = fmt.Sprintf("/spaces/%s/locales", spaceID)
 		method = "POST"
 	}
 
-	req, err := l.c.newRequest(method, path, nil, bytes.NewReader(bytesArray))
-	if err != nil {
-		return nil, err
-	}
-
-	version := strconv.Itoa(l.Sys.Version)
-	req.Header.Set("X-Contentful-Version", version)
-
-	return req, nil
-}
-
-// Delete the locale
-func (l *Locale) Delete() error {
-	path := "/spaces/" + l.s.ID() + "/locales/" + l.Sys.ID
-	method := "DELETE"
-
-	req, err := l.c.newRequest(method, path, nil, nil)
+	req, err := service.c.newRequest(method, path, nil, bytes.NewReader(bytesArray))
 	if err != nil {
 		return err
 	}
 
-	version := strconv.Itoa(l.Sys.Version)
-	req.Header.Set("X-Contentful-Version", version)
+	req.Header.Set("X-Contentful-Version", strconv.Itoa(locale.GetVersion()))
 
-	if err = l.c.do(req, nil); err != nil {
-		return err
+	if ok := service.c.do(req, locale); ok != nil {
+		return ok
 	}
 
 	return nil

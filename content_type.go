@@ -7,10 +7,10 @@ import (
 	"strconv"
 )
 
-//ContentType model
+type ContentTypesService service
+
+// ContentType model
 type ContentType struct {
-	c            *Contentful
-	s            *Space
 	Sys          *Sys     `json:"sys"`
 	Name         string   `json:"name,omitempty"`
 	Description  string   `json:"description,omitempty"`
@@ -50,13 +50,52 @@ type FieldTypeArrayItem struct {
 	LinkType    string            `json:"linkType,omitempty"`
 }
 
-// AddField to the content type
-func (ct *ContentType) AddField(field *Field) {
-	ct.Fields = append(ct.Fields, field)
+// GetVersion returns entity version
+func (ct *ContentType) GetVersion() int {
+	version := 1
+	if ct.Sys != nil {
+		version = ct.Sys.Version
+	}
+
+	return version
 }
 
-// Save the content type to contentful
-func (ct *ContentType) Save() error {
+// List return a content type collection
+func (service *ContentTypesService) List(spaceID string) *Collection {
+	path := fmt.Sprintf("/spaces/%s/content_types", spaceID)
+	method := "GET"
+
+	req, err := service.c.newRequest(method, path, nil, nil)
+	if err != nil {
+		return nil
+	}
+
+	col := NewCollection(&CollectionOptions{})
+	col.c = service.c
+	col.req = req
+
+	return col
+}
+
+func (service *ContentTypesService) Get(spaceID, contentTypeID string) (*ContentType, error) {
+	path := fmt.Sprintf("/spaces/%s/content_types/%s", spaceID, contentTypeID)
+	method := "GET"
+
+	req, err := service.c.newRequest(method, path, nil, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var ct ContentType
+	if err = service.c.do(req, &ct); err != nil {
+		return nil, err
+	}
+
+	return &ct, nil
+}
+
+// Upsert updates or creates a new content type
+func (service *ContentTypesService) Upsert(spaceID string, ct *ContentType) error {
 	bytesArray, err := json.Marshal(ct)
 	if err != nil {
 		return err
@@ -65,64 +104,22 @@ func (ct *ContentType) Save() error {
 	var path string
 	var method string
 
-	if ct.Sys.CreatedAt != "" {
-		path = "/spaces/" + ct.s.ID() + "/content_types/" + ct.Sys.ID
+	if ct.Sys != nil && ct.Sys.CreatedAt != "" {
+		path = fmt.Sprintf("/spaces/%s/content_types/%s", spaceID, ct.Sys.ID)
 		method = "PUT"
 	} else {
-		path = "/spaces/" + ct.s.ID() + "/content_types"
+		path = fmt.Sprintf("/spaces/%s/content_types", spaceID)
 		method = "POST"
 	}
 
-	req, err := ct.c.newRequest(method, path, nil, bytes.NewReader(bytesArray))
+	req, err := service.c.newRequest(method, path, nil, bytes.NewReader(bytesArray))
 	if err != nil {
 		return err
 	}
 
-	version := strconv.Itoa(ct.Sys.Version)
-	req.Header.Set("X-Contentful-Version", version)
+	req.Header.Set("X-Contentful-Version", strconv.Itoa(ct.GetVersion()))
 
-	if err = ct.c.do(req, ct); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// Activate the contenttype, a.k.a publish
-func (ct *ContentType) Activate() error {
-	path := "/spaces/" + ct.s.ID() + "/content_types/" + ct.Sys.ID + "/published"
-	method := "PUT"
-
-	req, err := ct.c.newRequest(method, path, nil, nil)
-	if err != nil {
-		return err
-	}
-
-	version := strconv.Itoa(ct.Sys.Version)
-	req.Header.Set("X-Contentful-Version", version)
-
-	if err = ct.c.do(req, ct); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// Deactivate the contenttype, a.k.a unpublish
-func (ct *ContentType) Deactivate() error {
-	path := "/spaces/" + ct.s.ID() + "/content_types/" + ct.Sys.ID + "/published"
-	method := "DELETE"
-
-	req, err := ct.c.newRequest(method, path, nil, nil)
-	if err != nil {
-		return err
-	}
-
-	version := strconv.Itoa(ct.Sys.Version)
-	req.Header.Set("X-Contentful-Version", version)
-
-	if err = ct.c.do(req, ct); err != nil {
-		fmt.Println(err)
+	if err = service.c.do(req, ct); err != nil {
 		return err
 	}
 
@@ -130,18 +127,11 @@ func (ct *ContentType) Deactivate() error {
 }
 
 // Delete the content_type
-func (ct *ContentType) Delete() (err error) {
-	if ct.Sys.PublishedAt != "" {
-		err = ct.Deactivate()
-		if err != nil {
-			return err
-		}
-	}
-
-	path := "/spaces/" + ct.s.ID() + "/content_types/" + ct.Sys.ID
+func (service *ContentTypesService) Delete(spaceID string, ct *ContentType) error {
+	path := fmt.Sprintf("/spaces/%s/content_types/%s", spaceID, ct.Sys.ID)
 	method := "DELETE"
 
-	req, err := ct.c.newRequest(method, path, nil, nil)
+	req, err := service.c.newRequest(method, path, nil, nil)
 	if err != nil {
 		return err
 	}
@@ -149,7 +139,48 @@ func (ct *ContentType) Delete() (err error) {
 	version := strconv.Itoa(ct.Sys.Version)
 	req.Header.Set("X-Contentful-Version", version)
 
-	if err = ct.c.do(req, nil); err != nil {
+	if err = service.c.do(req, nil); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// Activate the contenttype, a.k.a publish
+func (service *ContentTypesService) Activate(spaceID string, ct *ContentType) error {
+	path := fmt.Sprintf("/spaces/%s/content_types/%s/published", spaceID, ct.Sys.ID)
+	method := "PUT"
+
+	req, err := service.c.newRequest(method, path, nil, nil)
+	if err != nil {
+		return err
+	}
+
+	version := strconv.Itoa(ct.Sys.Version)
+	req.Header.Set("X-Contentful-Version", version)
+
+	if err = service.c.do(req, ct); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// Deactivate the contenttype, a.k.a unpublish
+func (service *ContentTypesService) Deactivate(spaceID string, ct *ContentType) error {
+	path := fmt.Sprintf("/spaces/%s/content_types/%s/published", spaceID, ct.Sys.ID)
+	method := "DELETE"
+
+	req, err := service.c.newRequest(method, path, nil, nil)
+	if err != nil {
+		return err
+	}
+
+	version := strconv.Itoa(ct.Sys.Version)
+	req.Header.Set("X-Contentful-Version", version)
+
+	if err = service.c.do(req, ct); err != nil {
+		fmt.Println(err)
 		return err
 	}
 

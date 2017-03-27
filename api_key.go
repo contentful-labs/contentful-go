@@ -3,13 +3,15 @@ package contentful
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"strconv"
 )
 
+// APIKeyService service
+type APIKeyService service
+
 // APIKey model
 type APIKey struct {
-	c             *Contentful
-	s             *Space
 	Sys           *Sys            `json:"sys,omitempty"`
 	Name          string          `json:"name"`
 	Description   string          `json:"description,omitempty"`
@@ -29,9 +31,65 @@ type PreviewAPIKey struct {
 	Sys *Sys
 }
 
-// Save the apikey
-func (ak *APIKey) Save() error {
-	bytesArray, err := json.Marshal(ak)
+// MarshalJSON for custom json marshaling
+func (a *APIKey) MarshalJSON() ([]byte, error) {
+	return json.Marshal(&struct {
+		Name        string `json:"name"`
+		Description string `json:"description,omitempty"`
+	}{
+		Name:        a.Name,
+		Description: a.Description,
+	})
+}
+
+// GetVersion returns entity version
+func (apiKey *APIKey) GetVersion() int {
+	version := 1
+	if apiKey.Sys != nil {
+		version = apiKey.Sys.Version
+	}
+
+	return version
+}
+
+// List returns all api keys collection
+func (service *APIKeyService) List(spaceID string) *Collection {
+	path := fmt.Sprintf("/spaces/%s/api_keys", spaceID)
+	method := "GET"
+
+	req, err := service.c.newRequest(method, path, nil, nil)
+	if err != nil {
+		return &Collection{}
+	}
+
+	col := NewCollection(&CollectionOptions{})
+	col.c = service.c
+	col.req = req
+
+	return col
+}
+
+// Get returns a single api key entity
+func (service *APIKeyService) Get(spaceID, apiKeyID string) (*APIKey, error) {
+	path := fmt.Sprintf("/spaces/%s/api_keys/%s", spaceID, apiKeyID)
+	method := "GET"
+
+	req, err := service.c.newRequest(method, path, nil, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var apiKey APIKey
+	if err := service.c.do(req, &apiKey); err != nil {
+		return nil, err
+	}
+
+	return &apiKey, nil
+}
+
+// Upsert updates or creates a new api key entity
+func (service *APIKeyService) Upsert(spaceID string, apiKey *APIKey) error {
+	bytesArray, err := json.Marshal(apiKey)
 	if err != nil {
 		return err
 	}
@@ -39,43 +97,42 @@ func (ak *APIKey) Save() error {
 	var path string
 	var method string
 
-	if ak.Sys.CreatedAt != "" {
-		path = "/spaces/" + ak.s.ID() + "/api_keys/" + ak.Sys.ID
+	if apiKey.Sys != nil && apiKey.Sys.CreatedAt != "" {
+		path = fmt.Sprintf("/spaces/%s/api_keys/%s", spaceID, apiKey.Sys.ID)
 		method = "PUT"
 	} else {
-		path = "/spaces/" + ak.s.ID() + "/api_keys"
+		path = fmt.Sprintf("/spaces/%s/api_keys", spaceID)
 		method = "POST"
 	}
 
-	req, err := ak.c.newRequest(method, path, nil, bytes.NewReader(bytesArray))
+	req, err := service.c.newRequest(method, path, nil, bytes.NewReader(bytesArray))
 	if err != nil {
 		return err
 	}
 
-	version := strconv.Itoa(ak.Sys.Version)
-	req.Header.Set("X-Contentful-Version", version)
+	req.Header.Set("X-Contentful-Version", strconv.Itoa(apiKey.GetVersion()))
 
-	if ok := ak.c.do(req, ak); ok != nil {
+	if ok := service.c.do(req, apiKey); ok != nil {
 		return ok
 	}
 
 	return nil
 }
 
-// Delete the locale
-func (ak *APIKey) Delete() error {
-	path := "/spaces/" + ak.s.ID() + "/api_keys/" + ak.Sys.ID
+// Delete deletes a sinlge api key entity
+func (service *APIKeyService) Delete(spaceID string, apiKey *APIKey) error {
+	path := fmt.Sprintf("/spaces/%s/api_keys/%s", spaceID, apiKey.Sys.ID)
 	method := "DELETE"
 
-	req, err := ak.c.newRequest(method, path, nil, nil)
+	req, err := service.c.newRequest(method, path, nil, nil)
 	if err != nil {
 		return err
 	}
 
-	version := strconv.Itoa(ak.Sys.Version)
+	version := strconv.Itoa(apiKey.Sys.Version)
 	req.Header.Set("X-Contentful-Version", version)
 
-	if err = ak.c.do(req, nil); err != nil {
+	if err = service.c.do(req, nil); err != nil {
 		return err
 	}
 

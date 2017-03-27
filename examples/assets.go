@@ -33,11 +33,6 @@ func main() {
 
 	cma = contentful.NewCMA(config.CMAToken)
 
-	space, err = cma.GetSpace(config.SpaceID)
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	getAssets()
 	getAsset()
 	createAsset()
@@ -49,43 +44,37 @@ func main() {
 }
 
 func getAssets() []*contentful.Asset {
-	collection, err := space.GetAssets().Next()
+	collection, err := cma.Assets.List(config.SpaceID).Next()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	assets := collection.ToAsset()
-
-	/* for _, asset := range assets {
-		fmt.Println(asset.ID(), asset.Fields.Title)
-	} */
-
-	return assets
+	return collection.ToAsset()
 }
 
 func getAsset() *contentful.Asset {
-	assetID := getAssets()[0].ID()
-
-	asset, err := space.GetAsset(assetID)
+	assetID := getAssets()[0].Sys.ID
+	asset, err := cma.Assets.Get(config.SpaceID, assetID)
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	fmt.Println(asset.Sys.Type)
 
 	return asset
 }
 
 func createAsset() *contentful.Asset {
-	asset := space.NewAsset()
-	asset.Fields.Title = "asset title"
-	asset.Fields.File = &contentful.File{
-		Name:        "file name",
-		ContentType: "image/jpg",
-		UploadURL:   "http://desireeacres.com/gopher.jpg",
+	asset := &contentful.Asset{
+		Fields: &contentful.FileFields{
+			Title: "asset title",
+			File: &contentful.File{
+				Name:        "file name",
+				ContentType: "image/jpg",
+				UploadURL:   "http://desireeacres.com/gopher.jpg",
+			},
+		},
 	}
 
-	err := asset.Save()
+	err := cma.Assets.Upsert(config.SpaceID, asset)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -96,15 +85,18 @@ func createAsset() *contentful.Asset {
 }
 
 func createAndEditAsset() {
-	asset := space.NewAsset()
-	asset.Fields.Title = "asset title"
-	asset.Fields.File = &contentful.File{
-		Name:        "file name",
-		ContentType: "image/jpg",
-		UploadURL:   "http://desireeacres.com/gopher.jpg",
+	asset := &contentful.Asset{
+		Fields: &contentful.FileFields{
+			Title: "asset title",
+			File: &contentful.File{
+				Name:        "file name",
+				ContentType: "image/jpg",
+				UploadURL:   "http://desireeacres.com/gopher.jpg",
+			},
+		},
 	}
 
-	err := asset.Save()
+	err := cma.Assets.Upsert(config.SpaceID, asset)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -113,7 +105,7 @@ func createAndEditAsset() {
 	fmt.Println(asset.Fields.Title)
 
 	asset.Fields.Title = "updated title for asset"
-	err = asset.Save()
+	err = cma.Assets.Upsert(config.SpaceID, asset)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -126,50 +118,39 @@ func editExistingAsset() {
 	asset := getAssets()[0]
 	asset.Fields.Title = "existing asset is updated"
 
-	fmt.Println("updating asset with id: " + asset.ID())
+	fmt.Println("updating asset with id: " + asset.Sys.ID)
 
-	err := asset.Save()
+	err := cma.Assets.Upsert(config.SpaceID, asset)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	updatedAsset, err := space.GetAsset(asset.ID())
+	updatedAsset, err := cma.Assets.Get(config.SpaceID, asset.Sys.ID)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	fmt.Println("new asset with id: " + updatedAsset.ID())
+	fmt.Println("new asset with id: " + updatedAsset.Sys.ID)
 	fmt.Println(updatedAsset.Fields.Title)
 }
 
 func deleteExistingAsset() {
 	asset := getAssets()[0]
-	fmt.Println("deleting asset with id: " + asset.ID())
+	fmt.Println("deleting asset with id: " + asset.Sys.ID)
 
-	err := asset.Delete()
+	err := cma.Assets.Delete(config.SpaceID, asset)
 	if err != nil {
 		log.Fatal(err)
 	}
 }
 
 func createAndProcessAsset() *contentful.Asset {
-	asset := space.NewAsset()
-	asset.Fields.Title = "asset title"
-	asset.Fields.File = &contentful.File{
-		Name:        "file name",
-		ContentType: "image/jpg",
-		UploadURL:   "http://desireeacres.com/gopher.jpg",
-	}
-
-	err := asset.Save()
-	if err != nil {
-		log.Fatal(err)
-	}
+	asset := createAsset()
 
 	fmt.Println("asset is created with id: " + asset.Sys.ID)
 	fmt.Println(asset.Fields.Title)
 
-	err = asset.Process()
+	err := cma.Assets.Process(config.SpaceID, asset)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -183,11 +164,11 @@ func publishAsset() {
 	asset := createAndProcessAsset()
 	time.Sleep(3 * time.Second)
 
-	err := asset.Publish()
+	err := cma.Assets.Publish(config.SpaceID, asset)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	fmt.Println("published with id : " + asset.ID())
+	fmt.Println("published with id : " + asset.Sys.ID)
 	fmt.Println("publish date: " + asset.Sys.PublishedAt)
 }

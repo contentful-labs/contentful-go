@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
+	"net/http/httputil"
 	"net/url"
 
 	"github.com/moul/http2curl"
@@ -19,11 +21,23 @@ type Contentful struct {
 	QueryParams map[string]string
 	Headers     map[string]string
 	BaseURL     string
+
+	Spaces       *SpacesService
+	APIKeys      *APIKeyService
+	Assets       *AssetsService
+	ContentTypes *ContentTypesService
+	Entries      *EntriesService
+	Locales      *LocalesService
+	Webhooks     *WebhooksService
+}
+
+type service struct {
+	c *Contentful
 }
 
 // NewCMA returns a CMA client
 func NewCMA(token string) *Contentful {
-	return &Contentful{
+	c := &Contentful{
 		client: http.DefaultClient,
 		api:    "CMA",
 		token:  token,
@@ -34,11 +48,21 @@ func NewCMA(token string) *Contentful {
 		},
 		BaseURL: "https://api.contentful.com",
 	}
+
+	c.Spaces = &SpacesService{c: c}
+	c.APIKeys = &APIKeyService{c: c}
+	c.Assets = &AssetsService{c: c}
+	c.ContentTypes = &ContentTypesService{c: c}
+	c.Entries = &EntriesService{c: c}
+	c.Locales = &LocalesService{c: c}
+	c.Webhooks = &WebhooksService{c: c}
+
+	return c
 }
 
 // NewCDA returns a CDA client
 func NewCDA(token string) *Contentful {
-	return &Contentful{
+	c := &Contentful{
 		client: http.DefaultClient,
 		api:    "CDA",
 		token:  token,
@@ -48,11 +72,21 @@ func NewCDA(token string) *Contentful {
 		},
 		BaseURL: "https://cda.contentful.com",
 	}
+
+	c.Spaces = &SpacesService{c: c}
+	c.APIKeys = &APIKeyService{c: c}
+	c.Assets = &AssetsService{c: c}
+	c.ContentTypes = &ContentTypesService{c: c}
+	c.Entries = &EntriesService{c: c}
+	c.Locales = &LocalesService{c: c}
+	c.Webhooks = &WebhooksService{c: c}
+
+	return c
 }
 
 // NewCPA returns a CPA client
 func NewCPA(token string) *Contentful {
-	return &Contentful{
+	c := &Contentful{
 		client: http.DefaultClient,
 		Debug:  false,
 		api:    "CPA",
@@ -62,6 +96,16 @@ func NewCPA(token string) *Contentful {
 		},
 		BaseURL: "https://preview.contentful.com",
 	}
+
+	c.Spaces = &SpacesService{c: c}
+	c.APIKeys = &APIKeyService{c: c}
+	c.Assets = &AssetsService{c: c}
+	c.ContentTypes = &ContentTypesService{c: c}
+	c.Entries = &EntriesService{c: c}
+	c.Locales = &LocalesService{c: c}
+	c.Webhooks = &WebhooksService{c: c}
+
+	return c
 }
 
 // SetOrganization sets the given organization id
@@ -69,44 +113,6 @@ func (c *Contentful) SetOrganization(organizationID string) *Contentful {
 	c.Headers["X-Contentful-Organization"] = organizationID
 
 	return c
-}
-
-// NewSpace creates a new space for the given token
-func (c *Contentful) NewSpace() *Space {
-	return &Space{
-		c: c,
-		Sys: &Sys{
-			Type:    "Space",
-			Version: 1,
-		},
-	}
-}
-
-// GetSpace returns a space
-func (c *Contentful) GetSpace(spaceID string) (*Space, error) {
-	req, err := c.newRequest("GET", "/spaces/"+spaceID, nil, nil)
-	if err != nil {
-		return &Space{}, err
-	}
-
-	var space Space
-	if ok := c.do(req, &space); ok != nil {
-		return &Space{}, ok
-	}
-
-	space.c = c
-	return &space, nil
-}
-
-// GetSpaces creates a collection
-func (c *Contentful) GetSpaces() *Collection {
-	req, _ := c.newRequest("GET", "/spaces", nil, nil)
-
-	col := NewCollection(&CollectionOptions{})
-	col.c = c
-	col.req = req
-
-	return col
 }
 
 func (c *Contentful) newRequest(method, path string, query url.Values, body io.Reader) (*http.Request, error) {
@@ -163,6 +169,15 @@ func (c *Contentful) do(req *http.Request, v interface{}) error {
 }
 
 func (c *Contentful) handleError(req *http.Request, res *http.Response) error {
+	if c.Debug == true {
+		dump, err := httputil.DumpResponse(res, true)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		fmt.Printf("%q", dump)
+	}
+
 	var e ErrorResponse
 	defer res.Body.Close()
 	err := json.NewDecoder(res.Body).Decode(&e)

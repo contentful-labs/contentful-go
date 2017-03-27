@@ -32,11 +32,6 @@ func main() {
 
 	cma = contentful.NewCMA(config.CMAToken)
 
-	space, err = cma.GetSpace(config.SpaceID)
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	getContentTypes()
 	getContentType()
 	createContentType()
@@ -47,13 +42,12 @@ func main() {
 }
 
 func getContentTypes() []*contentful.ContentType {
-	collection, err := space.GetContentTypes().Next()
+	collection, err := cma.ContentTypes.List(config.SpaceID).Next()
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	contentTypes := collection.ToContentType()
-
 	for _, contentType := range contentTypes {
 		fmt.Println(contentType.Sys.ID, contentType.Sys.PublishedAt)
 	}
@@ -62,7 +56,7 @@ func getContentTypes() []*contentful.ContentType {
 }
 
 func getContentType() *contentful.ContentType {
-	contentType, err := space.GetContentType("contentTypeTest1")
+	contentType, err := cma.ContentTypes.Get(config.SpaceID, "contentTypeTest1")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -73,28 +67,29 @@ func getContentType() *contentful.ContentType {
 }
 
 func createContentType() (*contentful.ContentType, error) {
-	contentType := space.NewContentType()
-	contentType.Name = "test content type"
-	contentType.DisplayField = "field1_id"
-	contentType.Description = "content type description"
-	contentType.Fields = []*contentful.Field{
-		&contentful.Field{
-			ID:       "field1_id",
-			Name:     "field1",
-			Type:     "Symbol",
-			Required: false,
-			Disabled: false,
-		},
-		&contentful.Field{
-			ID:       "field2_id",
-			Name:     "field2",
-			Type:     "Symbol",
-			Required: false,
-			Disabled: true,
+	contentType := &contentful.ContentType{
+		Name:         "test content type",
+		DisplayField: "field1_id",
+		Description:  "content type description",
+		Fields: []*contentful.Field{
+			&contentful.Field{
+				ID:       "field1_id",
+				Name:     "field1",
+				Type:     "Symbol",
+				Required: false,
+				Disabled: false,
+			},
+			&contentful.Field{
+				ID:       "field2_id",
+				Name:     "field2",
+				Type:     "Symbol",
+				Required: false,
+				Disabled: true,
+			},
 		},
 	}
 
-	err := contentType.Save()
+	err := cma.ContentTypes.Upsert(config.SpaceID, contentType)
 	if err != nil {
 		return nil, err
 	}
@@ -104,49 +99,36 @@ func createContentType() (*contentful.ContentType, error) {
 	return contentType, nil
 }
 
-func activateContentType() error {
+func activateContentType() *contentful.ContentType {
 	contentType, _ := createContentType()
 
-	err := contentType.Activate()
+	err := cma.ContentTypes.Activate(config.SpaceID, contentType)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	fmt.Println("content type is activated :", contentType.Name)
 
-	return nil
+	return contentType
 }
 
-func deactivateContentType() error {
-	contentType, _ := createContentType()
+func deactivateContentType() *contentful.ContentType {
+	contentType := activateContentType()
 
-	err := contentType.Activate()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	fmt.Println("content type is activated :", contentType.Name)
-
-	err = contentType.Deactivate()
+	err := cma.ContentTypes.Deactivate(config.SpaceID, contentType)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	fmt.Println("content type is deactivated :", contentType.Name)
 
-	return nil
+	return contentType
 }
 
 func deleteContentType() {
-	var err error
-	contentType, _ := createContentType()
+	contentType := deactivateContentType()
 
-	err = contentType.Activate()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	err = contentType.Delete()
+	err := cma.ContentTypes.Delete(config.SpaceID, contentType)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -155,16 +137,11 @@ func deleteContentType() {
 }
 
 func deleteAllDraftContentTypes() {
-	collection, err := space.GetContentTypes().Next()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	contentTypes := collection.ToContentType()
+	contentTypes := getContentTypes()
 
 	for _, contentType := range contentTypes {
 		if contentType.Sys.PublishedAt == "" {
-			err := contentType.Delete()
+			err := cma.ContentTypes.Delete(config.SpaceID, contentType)
 			if err != nil {
 				log.Fatal(err)
 			}
