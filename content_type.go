@@ -98,7 +98,7 @@ func (field *Field) UnmarshalJSON(data []byte) error {
 	}
 
 	if val, ok := payload["validations"]; ok {
-		validations, err := parseValidations(val.([]interface{}))
+		validations, err := ParseValidations(val.([]interface{}))
 		if err != nil {
 			return err
 		}
@@ -109,7 +109,7 @@ func (field *Field) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func parseValidations(data []interface{}) ([]FieldValidation, error) {
+func ParseValidations(data []interface{}) ([]FieldValidation, error) {
 	validations := []FieldValidation{}
 
 	for _, value := range data {
@@ -232,7 +232,7 @@ func (item *FieldTypeArrayItem) UnmarshalJSON(data []byte) error {
 	}
 
 	if val, ok := payload["validations"]; ok {
-		validations, err := parseValidations(val.([]interface{}))
+		validations, err := ParseValidations(val.([]interface{}))
 		if err != nil {
 			return err
 		}
