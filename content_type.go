@@ -44,11 +44,207 @@ type Field struct {
 	Validations []FieldValidation   `json:"validations,omitempty"`
 }
 
+// UnmarshalJSON for custom json unmarshaling
+func (field *Field) UnmarshalJSON(data []byte) error {
+	payload := map[string]interface{}{}
+	if err := json.Unmarshal(data, &payload); err != nil {
+		return err
+	}
+
+	if val, ok := payload["id"]; ok {
+		field.ID = val.(string)
+	}
+
+	if val, ok := payload["name"]; ok {
+		field.Name = val.(string)
+	}
+
+	if val, ok := payload["type"]; ok {
+		field.Type = val.(string)
+	}
+
+	if val, ok := payload["linkType"]; ok {
+		field.LinkType = val.(string)
+	}
+
+	if val, ok := payload["items"]; ok {
+		byteArray, err := json.Marshal(val)
+		if err != nil {
+			return nil
+		}
+
+		var fieldTypeArrayItem FieldTypeArrayItem
+		if err := json.Unmarshal(byteArray, &fieldTypeArrayItem); err != nil {
+			return err
+		}
+
+		field.Items = &fieldTypeArrayItem
+	}
+
+	if val, ok := payload["required"]; ok {
+		field.Required = val.(bool)
+	}
+
+	if val, ok := payload["localized"]; ok {
+		field.Localized = val.(bool)
+	}
+
+	if val, ok := payload["disabled"]; ok {
+		field.Disabled = val.(bool)
+	}
+
+	if val, ok := payload["omitted"]; ok {
+		field.Omitted = val.(bool)
+	}
+
+	if val, ok := payload["validations"]; ok {
+		validations, err := parseValidations(val.([]interface{}))
+		if err != nil {
+			return err
+		}
+
+		field.Validations = validations
+	}
+
+	return nil
+}
+
+func parseValidations(data []interface{}) ([]FieldValidation, error) {
+	validations := []FieldValidation{}
+
+	for _, value := range data {
+		validation := value.(map[string]interface{})
+		byteArray, err := json.Marshal(validation)
+		if err != nil {
+			return nil, err
+		}
+
+		if _, ok := validation["linkContentType"]; ok {
+			var fieldValidationLink FieldValidationLink
+			if err := json.Unmarshal(byteArray, &fieldValidationLink); err != nil {
+				return nil, err
+			}
+
+			validations = append(validations, fieldValidationLink)
+		}
+
+		if _, ok := validation["linkMimetypeGroup"]; ok {
+			var fieldValidationMimeType FieldValidationMimeType
+			if err := json.Unmarshal(byteArray, &fieldValidationMimeType); err != nil {
+				return nil, err
+			}
+
+			validations = append(validations, fieldValidationMimeType)
+		}
+
+		if _, ok := validation["assetImageDimensions"]; ok {
+			var fieldValidationDimension FieldValidationDimension
+			if err := json.Unmarshal(byteArray, &fieldValidationDimension); err != nil {
+				return nil, err
+			}
+
+			validations = append(validations, fieldValidationDimension)
+		}
+
+		if _, ok := validation["assetFileSize"]; ok {
+			var fieldValidationFileSize FieldValidationFileSize
+			if err := json.Unmarshal(byteArray, &fieldValidationFileSize); err != nil {
+				return nil, err
+			}
+
+			validations = append(validations, fieldValidationFileSize)
+		}
+
+		if _, ok := validation["unique"]; ok {
+			var fieldValidationUnique FieldValidationUnique
+			if err := json.Unmarshal(byteArray, &fieldValidationUnique); err != nil {
+				return nil, err
+			}
+
+			validations = append(validations, fieldValidationUnique)
+		}
+
+		if _, ok := validation["in"]; ok {
+			var fieldValidationPredefinedValues FieldValidationPredefinedValues
+			if err := json.Unmarshal(byteArray, &fieldValidationPredefinedValues); err != nil {
+				return nil, err
+			}
+
+			validations = append(validations, fieldValidationPredefinedValues)
+		}
+
+		if _, ok := validation["range"]; ok {
+			var fieldValidationRange FieldValidationRange
+			if err := json.Unmarshal(byteArray, &fieldValidationRange); err != nil {
+				return nil, err
+			}
+
+			validations = append(validations, fieldValidationRange)
+		}
+
+		if _, ok := validation["dateRange"]; ok {
+			var fieldValidationDate FieldValidationDate
+			if err := json.Unmarshal(byteArray, &fieldValidationDate); err != nil {
+				return nil, err
+			}
+
+			validations = append(validations, fieldValidationDate)
+		}
+
+		if _, ok := validation["size"]; ok {
+			var fieldValidationSize FieldValidationSize
+			if err := json.Unmarshal(byteArray, &fieldValidationSize); err != nil {
+				return nil, err
+			}
+
+			validations = append(validations, fieldValidationSize)
+		}
+
+		if _, ok := validation["regexp"]; ok {
+			var fieldValidationRegex FieldValidationRegex
+			if err := json.Unmarshal(byteArray, &fieldValidationRegex); err != nil {
+				return nil, err
+			}
+
+			validations = append(validations, fieldValidationRegex)
+		}
+	}
+
+	return validations, nil
+}
+
 // FieldTypeArrayItem model
 type FieldTypeArrayItem struct {
-	Type        string            `json:"type"`
-	Validations []FieldValidation `json:"validations"`
+	Type        string            `json:"type,omitempty"`
+	Validations []FieldValidation `json:"validations,omitempty"`
 	LinkType    string            `json:"linkType,omitempty"`
+}
+
+// UnmarshalJSON for custom json unmarshaling
+func (item *FieldTypeArrayItem) UnmarshalJSON(data []byte) error {
+	payload := map[string]interface{}{}
+	if err := json.Unmarshal(data, &payload); err != nil {
+		return err
+	}
+
+	if val, ok := payload["type"]; ok {
+		item.Type = val.(string)
+	}
+
+	if val, ok := payload["validations"]; ok {
+		validations, err := parseValidations(val.([]interface{}))
+		if err != nil {
+			return err
+		}
+
+		item.Validations = validations
+	}
+
+	if val, ok := payload["linktype"]; ok {
+		item.LinkType = val.(string)
+	}
+
+	return nil
 }
 
 // GetVersion returns entity version

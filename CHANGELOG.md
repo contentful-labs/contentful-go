@@ -1,3 +1,6 @@
+v0.2.0 (TBA)
+===
+* [Added] Content type field unmarshaling
 
 v0.1.0 (2017-03-26)
 ===

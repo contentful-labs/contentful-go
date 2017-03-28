@@ -541,3 +541,149 @@ func TestContentTypeFieldTypeMedia(t *testing.T) {
 	err = cma.ContentTypes.Upsert("id1", ct)
 	assert.Nil(err)
 }
+
+func TestContentTypeFieldValidationsUnmarshal(t *testing.T) {
+	var err error
+	assert := assert.New(t)
+
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(201)
+		fmt.Fprintln(w, string(readTestData("content_type_with_validations.json")))
+	})
+
+	server := httptest.NewServer(handler)
+	defer server.Close()
+
+	cma = NewCMA(CMAToken)
+	cma.BaseURL = server.URL
+
+	ct, err := cma.ContentTypes.Get(spaceID, "validationsTest")
+	assert.Nil(err)
+
+	uniqueValidations := []FieldValidation{}
+	linkValidations := []FieldValidation{}
+	sizeValidations := []FieldValidation{}
+	regexValidations := []FieldValidation{}
+	preDefinedValidations := []FieldValidation{}
+	rangeValidations := []FieldValidation{}
+	dateValidations := []FieldValidation{}
+	mimeTypeValidations := []FieldValidation{}
+	dimensionValidations := []FieldValidation{}
+	fileSizeValidations := []FieldValidation{}
+
+	for _, field := range ct.Fields {
+		if field.Name == "text-short" {
+			assert.Equal(4, len(field.Validations))
+			uniqueValidations = append(uniqueValidations, field.Validations[0])
+			sizeValidations = append(sizeValidations, field.Validations[1])
+			regexValidations = append(regexValidations, field.Validations[2])
+			preDefinedValidations = append(preDefinedValidations, field.Validations[3])
+		}
+
+		if field.Name == "text-long" {
+			assert.Equal(3, len(field.Validations))
+			sizeValidations = append(sizeValidations, field.Validations[0])
+			regexValidations = append(regexValidations, field.Validations[1])
+			preDefinedValidations = append(preDefinedValidations, field.Validations[2])
+		}
+
+		if field.Name == "number-integer" || field.Name == "number-decimal" {
+			assert.Equal(3, len(field.Validations))
+			uniqueValidations = append(uniqueValidations, field.Validations[0])
+			rangeValidations = append(rangeValidations, field.Validations[1])
+			preDefinedValidations = append(preDefinedValidations, field.Validations[2])
+		}
+
+		if field.Name == "date" {
+			assert.Equal(1, len(field.Validations))
+			dateValidations = append(dateValidations, field.Validations[0])
+		}
+
+		if field.Name == "location" || field.Name == "bool" {
+			assert.Equal(0, len(field.Validations))
+		}
+
+		if field.Name == "media-onefile" {
+			assert.Equal(3, len(field.Validations))
+			mimeTypeValidations = append(mimeTypeValidations, field.Validations[0])
+			dimensionValidations = append(dimensionValidations, field.Validations[1])
+			fileSizeValidations = append(fileSizeValidations, field.Validations[2])
+		}
+
+		if field.Name == "media-manyfiles" {
+			assert.Equal(1, len(field.Validations))
+			assert.Equal(3, len(field.Items.Validations))
+			sizeValidations = append(sizeValidations, field.Validations[0])
+			mimeTypeValidations = append(mimeTypeValidations, field.Items.Validations[0])
+			dimensionValidations = append(dimensionValidations, field.Items.Validations[1])
+			fileSizeValidations = append(fileSizeValidations, field.Items.Validations[2])
+		}
+
+		if field.Name == "json" {
+			assert.Equal(1, len(field.Validations))
+			sizeValidations = append(sizeValidations, field.Validations[0])
+		}
+
+		if field.Name == "ref-onref" {
+			assert.Equal(1, len(field.Validations))
+			linkValidations = append(linkValidations, field.Validations[0])
+		}
+
+		if field.Name == "ref-manyRefs" {
+			assert.Equal(1, len(field.Validations))
+			assert.Equal(1, len(field.Items.Validations))
+			linkValidations = append(linkValidations, field.Items.Validations[0])
+			sizeValidations = append(sizeValidations, field.Validations[0])
+		}
+	}
+
+	for _, validation := range uniqueValidations {
+		_, ok := validation.(FieldValidationUnique)
+		assert.True(ok)
+	}
+
+	for _, validation := range linkValidations {
+		_, ok := validation.(FieldValidationLink)
+		assert.True(ok)
+	}
+
+	for _, validation := range sizeValidations {
+		_, ok := validation.(FieldValidationSize)
+		assert.True(ok)
+	}
+
+	for _, validation := range regexValidations {
+		_, ok := validation.(FieldValidationRegex)
+		assert.True(ok)
+	}
+
+	for _, validation := range preDefinedValidations {
+		_, ok := validation.(FieldValidationPredefinedValues)
+		assert.True(ok)
+	}
+
+	for _, validation := range rangeValidations {
+		_, ok := validation.(FieldValidationRange)
+		assert.True(ok)
+	}
+
+	for _, validation := range dateValidations {
+		_, ok := validation.(FieldValidationDate)
+		assert.True(ok)
+	}
+
+	for _, validation := range mimeTypeValidations {
+		_, ok := validation.(FieldValidationMimeType)
+		assert.True(ok)
+	}
+
+	for _, validation := range dimensionValidations {
+		_, ok := validation.(FieldValidationDimension)
+		assert.True(ok)
+	}
+
+	for _, validation := range fileSizeValidations {
+		_, ok := validation.(FieldValidationFileSize)
+		assert.True(ok)
+	}
+}

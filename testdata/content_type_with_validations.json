@@ -1,0 +1,366 @@
+{
+  "name": "validations-test",
+  "fields": [
+    {
+      "name": "text-short",
+      "id": "HbvLK9kzF91K9byY",
+      "apiName": "textShort",
+      "type": "Symbol",
+      "required": true,
+      "validations": [
+        {
+          "unique": true
+        },
+        {
+          "size": {
+            "min": 10,
+            "max": 20
+          },
+          "message": "text-short range error message"
+        },
+        {
+          "regexp": {
+            "pattern": "^\\w[\\w.-]*@([\\w-]+\\.)+[\\w-]+$",
+            "flags": "g"
+          },
+          "message": "text-short regex error message"
+        },
+        {
+          "in": [
+            "test",
+            "3",
+            "5"
+          ],
+          "message": "text-short predefined values error message"
+        }
+      ],
+      "localized": false,
+      "disabled": false,
+      "omitted": false
+    },
+    {
+      "name": "text-long",
+      "id": "y5NKeXJImJidOLOF",
+      "apiName": "textLong",
+      "type": "Text",
+      "required": true,
+      "validations": [
+        {
+          "size": {
+            "min": 5,
+            "max": 19
+          },
+          "message": "text-long range error message"
+        },
+        {
+          "regexp": {
+            "pattern": "^(0?[1-9]|[12][0-9]|3[01])[- \\/.](0?[1-9]|1[012])[- \\/.](19|20)?\\d\\d$",
+            "flags": "g"
+          },
+          "message": "text-long regex error message"
+        },
+        {
+          "in": [
+            "val"
+          ],
+          "message": "text-long predefined values custom error message"
+        }
+      ]
+    },
+    {
+      "name": "number-integer",
+      "id": "fYw4yVZHkAIYe4JB",
+      "apiName": "numberInteger",
+      "type": "Integer",
+      "required": true,
+      "validations": [
+        {
+          "unique": true
+        },
+        {
+          "range": {
+            "min": 10,
+            "max": 20
+          },
+          "message": "number-integer range error message"
+        },
+        {
+          "in": [
+            12,
+            14
+          ],
+          "message": "number-integer predefined values error values"
+        }
+      ]
+    },
+    {
+      "name": "number-decimal",
+      "id": "e7xPyLeknXzWHCAJ",
+      "apiName": "numberDecimal",
+      "type": "Number",
+      "required": true,
+      "validations": [
+        {
+          "unique": true
+        },
+        {
+          "range": {
+            "min": 5
+          },
+          "message": "number-decimal range error message"
+        },
+        {
+          "in": [
+            6,
+            19
+          ],
+          "message": "number-decimal predefined values error message"
+        }
+      ]
+    },
+    {
+      "name": "date",
+      "id": "FHjBxcapHJXJdlkE",
+      "apiName": "date",
+      "type": "Date",
+      "required": true,
+      "validations": [
+        {
+          "dateRange": {
+            "after": null,
+            "before": null,
+            "min": "2017-03-15T10:00:00",
+            "max": "2017-03-31T11:00:00"
+          },
+          "message": "date error message"
+        }
+      ]
+    },
+    {
+      "name": "location",
+      "id": "oX4Cv7v26o64YNXX",
+      "apiName": "location",
+      "type": "Location",
+      "required": true,
+      "validations": []
+    },
+    {
+      "name": "media-onefile",
+      "id": "yW00FKvHHYGqNIgW",
+      "apiName": "mediaOnefile",
+      "type": "Link",
+      "linkType": "Asset",
+      "required": true,
+      "validations": [
+        {
+          "linkMimetypeGroup": [
+            "attachment",
+            "plaintext",
+            "image",
+            "audio",
+            "video",
+            "richtext",
+            "presentation",
+            "spreadsheet",
+            "pdfdocument",
+            "archive",
+            "code",
+            "markup"
+          ],
+          "message": "media-onefile mime type error message"
+        },
+        {
+          "assetImageDimensions": {
+            "width": {
+              "min": 100,
+              "max": 200
+            },
+            "height": {
+              "min": 100,
+              "max": 200
+            }
+          },
+          "message": "media-onefile dimension error message"
+        },
+        {
+          "assetFileSize": {
+            "min": 10485760,
+            "max": 30408704
+          },
+          "message": "media-onefile file size error message"
+        }
+      ]
+    },
+    {
+      "name": "media-manyfiles",
+      "id": "Aomif1Mekh2BN2vo",
+      "apiName": "mediaManyfiles",
+      "type": "Array",
+      "items": {
+        "type": "Link",
+        "linkType": "Asset",
+        "validations": [
+          {
+            "linkMimetypeGroup": [
+              "attachment",
+              "plaintext",
+              "image",
+              "audio",
+              "video",
+              "richtext",
+              "spreadsheet",
+              "pdfdocument",
+              "archive",
+              "code",
+              "markup"
+            ],
+            "message": "media-manyfiles error message"
+          },
+          {
+            "assetImageDimensions": {
+              "width": {
+                "min": 200,
+                "max": 200
+              },
+              "height": {
+                "min": 300,
+                "max": 400
+              }
+            },
+            "message": "media-manufiles dimensin error message"
+          },
+          {
+            "assetFileSize": {
+              "min": 20480,
+              "max": 40960
+            },
+            "message": "media-manyfiles file size error message"
+          }
+        ]
+      },
+      "required": true,
+      "validations": [
+        {
+          "size": {
+            "min": 2,
+            "max": 4
+          },
+          "message": "media-manyfiles accept only error message"
+        }
+      ]
+    },
+    {
+      "name": "bool",
+      "id": "kNXc1q71qKHyaqWi",
+      "apiName": "bool",
+      "type": "Boolean",
+      "required": true,
+      "validations": []
+    },
+    {
+      "name": "json",
+      "id": "gAh5d0vzBG5XNYQL",
+      "apiName": "json",
+      "type": "Object",
+      "required": true,
+      "validations": [
+        {
+          "size": {
+            "min": 30,
+            "max": 40
+          },
+          "message": "json number of prop error message"
+        }
+      ]
+    },
+    {
+      "name": "ref-oneref",
+      "id": "LGcZi0zOZ5oVbZG1",
+      "apiName": "refOneref",
+      "type": "Link",
+      "linkType": "Entry",
+      "required": true,
+      "validations": [
+        {
+          "linkContentType": [
+            "sFzTZbSuM8coEwygeUYes",
+            "6XwpTaSiiI2Ak2Ww0oi6qa",
+            "2PqfXUJwE8qSYKuM0U6w8M"
+          ],
+          "message": "ref-oneref accept types error message"
+        }
+      ]
+    },
+    {
+      "name": "ref-manyRefs",
+      "id": "MB0nzivjE8vyIgCi",
+      "apiName": "refManyRefs",
+      "type": "Array",
+      "items": {
+        "type": "Link",
+        "linkType": "Entry",
+        "validations": [
+          {
+            "linkContentType": [
+              "sFzTZbSuM8coEwygeUYes",
+              "6XwpTaSiiI2Ak2Ww0oi6qa",
+              "2PqfXUJwE8qSYKuM0U6w8M"
+            ],
+            "message": "ref-manyRefs accept type error message"
+          }
+        ]
+      },
+      "required": true,
+      "validations": [
+        {
+          "size": {
+            "min": 2,
+            "max": 3
+          },
+          "message": "ref-manyRefs number of entries error message"
+        }
+      ]
+    }
+  ],
+  "displayField": "HbvLK9kzF91K9byY",
+  "description": "",
+  "sys": {
+    "id": "validationsTest",
+    "type": "ContentType",
+    "createdAt": "2017-03-28T09:37:59.869Z",
+    "createdBy": {
+      "sys": {
+        "type": "Link",
+        "linkType": "User",
+        "id": "7aAReMWo8woRiCCd2wFNwB"
+      }
+    },
+    "space": {
+      "sys": {
+        "type": "Link",
+        "linkType": "Space",
+        "id": "d3e3f3blz3ih"
+      }
+    },
+    "firstPublishedAt": "2017-03-28T09:38:00.250Z",
+    "publishedCounter": 4,
+    "publishedAt": "2017-03-28T09:54:16.774Z",
+    "publishedBy": {
+      "sys": {
+        "type": "Link",
+        "linkType": "User",
+        "id": "7aAReMWo8woRiCCd2wFNwB"
+      }
+    },
+    "publishedVersion": 7,
+    "version": 9,
+    "updatedAt": "2017-03-28T10:47:55.699Z",
+    "updatedBy": {
+      "sys": {
+        "type": "Link",
+        "linkType": "User",
+        "id": "7aAReMWo8woRiCCd2wFNwB"
+      }
+    }
+  }
+}
