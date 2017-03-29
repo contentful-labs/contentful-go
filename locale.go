@@ -12,14 +12,28 @@ type LocalesService service
 
 // Locale model
 type Locale struct {
-	Sys          *Sys   `json:"sys,omitempty"`
-	Name         string `json:"name,omitempty"`
-	Code         string `json:"code,omitempty"`
+	Sys *Sys `json:"sys,omitempty"`
+
+	// Locale name
+	Name string `json:"name,omitempty"`
+
+	// Language code
+	Code string `json:"code,omitempty"`
+
+	// If no content is provided for the locale, the Delivery API will return content in a locale specified below:
 	FallbackCode string `json:"fallbackCode,omitempty"`
-	Default      bool   `json:"default,omitempty"`
-	Optional     bool   `json:"optional,omitempty"`
-	CDA          bool   `json:"contentDeliveryApi,omitempty"`
-	CMA          bool   `json:"contentManagementApi,omitempty"`
+
+	// Make the locale as default locale for your account
+	Default bool `json:"default,omitempty"`
+
+	// Entries with required fields can still be published if locale is empty.
+	Optional bool `json:"optional,omitempty"`
+
+	// Includes locale in the Delivery API response.
+	CDA bool `json:"contentDeliveryApi"`
+
+	// Displays locale to editors and enables it in Management API.
+	CMA bool `json:"contentManagementApi"`
 }
 
 // GetVersion returns entity version
@@ -97,7 +111,7 @@ func (service *LocalesService) Upsert(spaceID string, locale *Locale) error {
 	var path string
 	var method string
 
-	if locale.Sys.CreatedAt != "" {
+	if locale.Sys != nil && locale.Sys.CreatedAt != "" {
 		path = fmt.Sprintf("/spaces/%s/locales/%s", spaceID, locale.Sys.ID)
 		method = "PUT"
 	} else {
