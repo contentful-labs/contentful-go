@@ -109,14 +109,26 @@ func (field *Field) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func ParseValidations(data []interface{}) ([]FieldValidation, error) {
-	validations := []FieldValidation{}
-
+func ParseValidations(data []interface{}) (validations []FieldValidation, err error) {
 	for _, value := range data {
-		validation := value.(map[string]interface{})
-		byteArray, err := json.Marshal(validation)
-		if err != nil {
-			return nil, err
+		var validation map[string]interface{}
+		var byteArray []byte
+
+		if validationStr, ok := value.(string); ok {
+			if err := json.Unmarshal([]byte(validationStr), &validation); err != nil {
+				return nil, err
+			}
+
+			byteArray = []byte(validationStr)
+		}
+
+		if validationMap, ok := value.(map[string]interface{}); ok {
+			byteArray, err = json.Marshal(validationMap)
+			if err != nil {
+				return nil, err
+			}
+
+			validation = validationMap
 		}
 
 		if _, ok := validation["linkContentType"]; ok {
