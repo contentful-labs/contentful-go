@@ -34,7 +34,8 @@ func main() {
 	cma = contentful.NewCMA(config.CMAToken)
 
 	getSpaces()
-	// deleteAllSpaces()
+	createSpace("sufix")
+	deleteAllSpaces()
 }
 
 func getSpaces() []*contentful.Space {
@@ -57,6 +58,20 @@ func getSpace() *contentful.Space {
 	space, err := cma.Spaces.Get(spaceID)
 	if err != nil {
 		log.Fatal(err)
+	}
+
+	return space
+}
+
+func createSpace(name string) *contentful.Space {
+	space := &contentful.Space{
+		Name:          fmt.Sprintf("test-space-%s", name),
+		DefaultLocale: "en-US",
+	}
+
+	err := cma.Spaces.Upsert(space)
+	if err != nil {
+		return nil
 	}
 
 	return space
