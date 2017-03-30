@@ -1,0 +1,8 @@
+{
+  "requestId":"request-id",
+  "message":"You are creating too many Spaces.",
+  "sys":{
+    "type":"Error",
+    "id":"RateLimitExceeded"
+  }
+}

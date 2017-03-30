@@ -79,8 +79,16 @@ func (e NotFoundError) Error() string {
 	return "the requested resource can not be found"
 }
 
+// RateLimitExceededError for rate limit errors
+type RateLimitExceededError struct {
+	APIError
+}
+
+func (e RateLimitExceededError) Error() string {
+	return e.APIError.err.Message
+}
+
 type BadRequestError struct{}
 type InvalidQueryError struct{}
 type AccessDeniedError struct{}
-type RateLimitExceededError struct{}
 type ServerError struct{}

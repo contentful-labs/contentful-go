@@ -8,6 +8,8 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"strconv"
+	"time"
 
 	"github.com/moul/http2curl"
 )
@@ -153,19 +155,42 @@ func (c *Contentful) do(req *http.Request, v interface{}) error {
 		return err
 	}
 
-	if res.StatusCode >= 400 {
-		return c.handleError(req, res)
-	}
-
-	if v != nil {
-		defer res.Body.Close()
-		err = json.NewDecoder(res.Body).Decode(v)
-		if err != nil {
-			return err
+	if res.StatusCode >= 200 && res.StatusCode < 400 {
+		if v != nil {
+			defer res.Body.Close()
+			err = json.NewDecoder(res.Body).Decode(v)
+			if err != nil {
+				return err
+			}
 		}
+
+		return nil
 	}
 
-	return nil
+	// parse api response
+	apiError := c.handleError(req, res)
+
+	// return apiError if it is not rate limit error
+	if _, ok := apiError.(RateLimitExceededError); !ok {
+		return apiError
+	}
+
+	resetHeader := res.Header.Get("x-contentful-ratelimit-reset")
+
+	// return apiError if Ratelimit-Reset header is not presented
+	if resetHeader == "" {
+		return apiError
+	}
+
+	// wait X-Contentful-Ratelimit-Reset amount of seconds
+	waitSeconds, err := strconv.Atoi(resetHeader)
+	if err != nil {
+		return apiError
+	}
+
+	time.Sleep(time.Second * time.Duration(waitSeconds))
+
+	return c.do(req, v)
 }
 
 func (c *Contentful) handleError(req *http.Request, res *http.Response) error {
@@ -185,51 +210,26 @@ func (c *Contentful) handleError(req *http.Request, res *http.Response) error {
 		return err
 	}
 
-	if res.StatusCode == 500 {
-		fmt.Println("500 response")
+	apiError := APIError{
+		req: req,
+		res: res,
+		err: &e,
 	}
 
-	if e.Sys.ID == "NotFound" {
-		return NotFoundError{
-			APIError{
-				req: req,
-				res: res,
-				err: &e,
-			},
-		}
+	switch errType := e.Sys.ID; errType {
+	case "NotFound":
+		return NotFoundError{apiError}
+	case "RateLimitExceeded":
+		return RateLimitExceededError{apiError}
+	case "AccessTokenInvalid":
+		return AccessTokenInvalidError{apiError}
+	case "ValidationFailed":
+		return ValidationFailedError{apiError}
+	case "VersionMismatch":
+		return VersionMismatchError{apiError}
+	case "Conflict":
+		return VersionMismatchError{apiError}
+	default:
+		return e
 	}
-
-	if e.Sys.ID == "AccessTokenInvalid" {
-		return AccessTokenInvalidError{
-			APIError{
-				req: req,
-				res: res,
-				err: &e,
-			},
-		}
-	}
-
-	if e.Sys.ID == "VersionMismatch" || e.Sys.ID == "Conflict" {
-		return VersionMismatchError{
-			APIError{
-				req: req,
-				res: res,
-				err: &e,
-			},
-		}
-	}
-
-	if e.Sys.ID == "ValidationFailed" {
-		return ValidationFailedError{
-			APIError{
-				req: req,
-				res: res,
-				err: &e,
-			},
-		}
-	}
-
-	fmt.Println(e.Sys.ID)
-
-	return e
 }

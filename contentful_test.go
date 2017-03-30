@@ -9,8 +9,10 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"strconv"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -235,4 +237,46 @@ func TestGetSpaces(t *testing.T) {
 	assert.Equal("Space", spaces[0].Sys.Type)
 	assert.Equal("id1", spaces[0].Sys.ID)
 	assert.Equal("Contentful Example API", spaces[0].Name)
+}
+
+func TestBackoffForPerSecondLimiting(t *testing.T) {
+	var err error
+	assert := assert.New(t)
+	rateLimited := true
+	waitSeconds := 2
+
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if rateLimited == true {
+			w.Header().Set("X-Contentful-Request-Id", "request-id")
+			w.Header().Set("Content-Type", "application/vnd.contentful.management.v1+json")
+			w.Header().Set("X-Contentful-Ratelimit-Hour-Limit", "36000")
+			w.Header().Set("X-Contentful-Ratelimit-Hour-Remaining", "35883")
+			w.Header().Set("X-Contentful-Ratelimit-Reset", strconv.Itoa(waitSeconds))
+			w.Header().Set("X-Contentful-Ratelimit-Second-Limit", "10")
+			w.Header().Set("X-Contentful-Ratelimit-Second-Remaining", "0")
+			w.WriteHeader(429)
+
+			w.Write([]byte(readTestData("error-ratelimit.json")))
+		} else {
+			w.Write([]byte(readTestData("space-1.json")))
+		}
+	})
+
+	// test server
+	server := httptest.NewServer(handler)
+	defer server.Close()
+
+	// cma client
+	cma = NewCMA(CMAToken)
+	cma.BaseURL = server.URL
+
+	go func() {
+		time.Sleep(time.Second * time.Duration(waitSeconds))
+		rateLimited = false
+	}()
+
+	space, err := cma.Spaces.Get("id1")
+	assert.Nil(err)
+	assert.Equal(space.Name, "Contentful Example API")
+	assert.Equal(space.Sys.ID, "id1")
 }
