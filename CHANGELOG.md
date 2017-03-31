@@ -1,5 +1,8 @@
-v0.2.0 (TBA)
+v0.1.1 (2017-03-31)
 ===
+
+* [Added] Rate-limited api requests
+* [Fix] Locale model
 * [Added] Content type field unmarshaling
 
 v0.1.0 (2017-03-26)
