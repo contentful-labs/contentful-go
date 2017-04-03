@@ -1,60 +1,120 @@
 # contentful-go
-Contentful api client for GoLang (UNOFFICIAL)
 
-## Install
+GoLang SDK for [Contentful's](https://www.contentful.com) Content Delivery, Preview and Management API's. 
 
-`go get -u github.com/tolgaakyuz/contentful-go`
+# About
 
-## Getting Started
+[Contentful](https://www.contentful.com) is a content management platform for web applications, mobile apps and connected devices. It allows you to create, edit & manage content in the cloud and publish it anywhere via a powerful API. Contentful offers tools for managing editorial teams and enabling cooperation between organizations.
 
-Setting up SDK client is very easy and it only requires passing a simple settings to sdk. The following example is create a sdk instance and it is enough to have to get benefit of all the sdk functions.
+[Go](https://golang.org) is an open source programming language that makes it easy to build simple, reliable, and efficient software.
+
+# Install
+
+`go get github.com/contentful-labs/contentful-go`
+
+# Getting started
+
+Import into your Go project or library
 
 ```go
-token := "your-cma-token"
+import (
+	contentful "github.com/contentful-labs/contentful-go"
+)
+```
+
+Create a API client in order to interact with the Contentful's API endpoints.
+
+```go
+token := "your-cma-token" // observe your CMA token from Contentful's web page
 cma := contentful.NewCMA(token)
 ```
 
-### Setting Organization
-When you set `organizationID` for contentful sdk client, every api request will have `X-Contentful-Organization: organizationID` header.
+#### Organization
+
+If your Contentful account is part of an organization, you can setup your API client as so. When you set your organization id for the SDK client, every api request will have `X-Contentful-Organization: <your-organization-id>` header automatically.
 
 ```go
-token := "your-cma-token"
-organizationID := "your-organization-id"
-
-cma := contentful.NewCMA(token)
-cma.SetOrganization(organizationID)
+cma.SetOrganization("your-organization-id")
 ```
 
-### Debug mode
+#### Debug mode
 
-When activated, sdk client starts to work in verbose mode and try to print as much informatin as possible. In debug mode, all outgoing http requests are printed nicely in the form of `curl` command so that you can easly drop into your command line to debug specific request.
+When debug mode is activated, sdk client starts to work in verbose mode and try to print as much informatin as possible. In debug mode, all outgoing http requests are printed nicely in the form of `curl` command so that you can easly drop into your command line to debug specific request.
 
 ```go
-c.Debug = true
+cma.Debug = true
 ```
 
-### Dependencies
+#### Dependencies
 
 `contentful-go` stores its dependencies under `vendor` folder and uses [`godep`](https://github.com/tools/godep) to manage the vendoring process. Dependencies in `vendor` folder will be loaded automatically by [Go 1.6+](https://golang.org/cmd/go/#hdr-Vendor_Directories).
 
-## Concepts
+# Using the SDK
 
-- [Querying](#querying) - Explains how to issue query requests
-- [Collections](#collections) - General rules for multi resource endpoints, paginating,  type casting etc.
+## Working with resource services
 
-### Collections
+Currently SDK exposes the following resource services:
 
-All the endpoints which return multiple entity objects are wrapped around `Collection` struct. The main goal of `Collection` is to give you the ability to cast api results into entity objects such as `Space`. `Collection` struct exposes the necessary converters such as `toSpace()`. The following example gets all spaces for the given account:
+* Spaces
+* APIKeys
+* Assets
+* ContentTypes
+* Entries
+* Locales
+* Webhooks
+
+Every resource service has at least the following interface:
 
 ```go
-col, err := c.Spaces.List().Next()
+List() *Collection
+Get(spaceID, resourceID string) <Resource>, error
+Upsert(spaceID string, resourceID *Resource) error
+Delete(spaceID string, resourceID *Resource) error
+```
+
+#### Example
+
+```go
+space, err := cma.Spaces.Get("space-id")
 if err != nil {
   log.Fatal(err)
 }
-spaces := col.ToSpace()
+
+collection := cma.ContentTypes.List(space.Sys.ID)
+collection, err := collection.Next()
+if err != nil {
+  log.Fatal(err)
+}
+
+for _, contentType := range collection.ToContentType() {
+  fmt.Println(contentType.Name, contentType.Description)
+}
+```
+
+## Working with collections
+
+All the endpoints which return an array of objects are wrapped around `Collection` struct. The main features of `Collection` are pagination and type assertion.
+
+### Pagination
+WIP
+
+### Type assertion
+
+`Collection` struct exposes the necessary converters (type assertion) such as `ToSpace()`. The following example gets all spaces for the given account:
+
+### Example
+
+```go
+collection := cma.Spaces.List() // returns a collection
+collection, err := collection.Next() // makes the actual api call
+if err != nil {
+  log.Fatal(err)
+}
+
+spaces := collection.ToSpace() // make the type assertion
 for _, space := range spaces {
   fmt.Println(space.Name)
-  fmt.Println(space.Sys.ID) // or space.ID()
+  fmt.Println(space.Sys.ID)
 }
 
 // In order to access collection metadata
@@ -63,27 +123,32 @@ fmt.Println(col.Skip)
 fmt.Println(col.Limit)
 ```
 
-You can also call `Collection.Next()` to paginate or nagivate through the collection:
+## Testing
 
-```go
-col := c.Spaces.List()
-
-while col.HasMore() {
-  _, err := col.Next()
-  if err != nil {
-    break
-  }
-
-  spaces := col.ToSpace() // next 100 space is populated
-}
+```shell
+$> go test
 ```
 
-In order to change the pagination limit of collection, you can initialize `Collection` struct with a option parameter:
+To enable higher verbose mode
 
-```go
-col, err := c.Spaces.List(&CollectionOption{
-  Limit; 60,
-})
-
-// now, everytime `col.Next()` is called, it will fetch the next 60 object from api
+```shell
+$> go test -v -race
 ```
+
+## Documentation/References
+
+### Contentful
+[Content Delivery API](https://www.contentful.com/developers/docs/references/content-delivery-api/)
+[Content Management API](https://www.contentful.com/developers/docs/references/content-management-api/)
+[Content Preview API](https://www.contentful.com/developers/docs/references/content-preview-api/)
+
+### GoLang
+[Effective Go](https://golang.org/doc/effective_go.html)
+
+## Support
+
+If you have any problems/questions or suggestions, please file an [issue](https://github.com/contentful-labs/contentful-go/issues/new) here on Github.
+
+## License
+
+MIT

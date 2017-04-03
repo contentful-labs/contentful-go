@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/BurntSushi/toml"
-	contentful "github.com/tolgaakyuz/contentful-go"
+	contentful "github.com/contentful-labs/contentful-go"
 )
 
 type Config struct {
