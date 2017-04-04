@@ -57,7 +57,7 @@ func NewQuery() *Query {
 		near:        make(map[string]string),
 		within:      make(map[string]string),
 		order:       []string{},
-		limit:       100,
+		limit:       0,
 		skip:        0,
 		mime:        "",
 		locale:      "",
