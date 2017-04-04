@@ -1,14 +1,6 @@
 {
-    "memo": "5dcd54ead9e8b7dc3f80b0e29d08ab16687647abfb98ea38ee3d906e149d494c",
+    "memo": "7e8daa6990ca7d6b632382019d998599f6c6494c830279b23a50b9d118b75859",
     "projects": [
-        {
-            "name": "github.com/BurntSushi/toml",
-            "branch": "master",
-            "revision": "d94612f9fc140360834f9742158c70b5c5b5535b",
-            "packages": [
-                "."
-            ]
-        },
         {
             "name": "github.com/davecgh/go-spew",
             "version": "v1.1.0",

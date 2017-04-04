@@ -1,6 +1,12 @@
+[![Coverage Status](https://coveralls.io/repos/github/contentful-labs/contentful-go/badge.svg?branch=ci)](https://coveralls.io/github/contentful-labs/contentful-go?branch=ci)
+[![Godoc](https://img.shields.io/badge/godoc-Reference-brightgreen.svg?style=flat)](https://godoc.org/github.com/contentful-labs/contentful-go)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Build Status](https://travis-ci.com/contentful-labs/contentful-go.svg?token=ppF3HxXy28XU9AwHHiGX&branch=master)](https://travis-ci.com/contentful-labs/contentful-go)
+
+
 # contentful-go
 
-GoLang SDK for [Contentful's](https://www.contentful.com) Content Delivery, Preview and Management API's. 
+GoLang SDK for [Contentful's](https://www.contentful.com) Content Delivery, Preview and Management API's.
 
 # About
 
@@ -47,7 +53,7 @@ cma.Debug = true
 
 #### Dependencies
 
-`contentful-go` stores its dependencies under `vendor` folder and uses [`godep`](https://github.com/tools/godep) to manage the vendoring process. Dependencies in `vendor` folder will be loaded automatically by [Go 1.6+](https://golang.org/cmd/go/#hdr-Vendor_Directories).
+`contentful-go` stores its dependencies under `vendor` folder and uses [`dep`](https://github.com/golang/dep) to manage the vendoring process. Dependencies in `vendor` folder will be loaded automatically by [Go 1.6+](https://golang.org/cmd/go/#hdr-Vendor_Directories).
 
 # Using the SDK
 
@@ -147,7 +153,11 @@ $> go test -v -race
 
 ## Support
 
-If you have any problems/questions or suggestions, please file an [issue](https://github.com/contentful-labs/contentful-go/issues/new) here on Github.
+This is a project created for demo purposes and not officially supported, so if you find issues or have questions you can let us know via the [issue](https://github.com/contentful-labs/contentful-go/issues/new) page but don't expect a quick and prompt response.
+
+## Contributing
+
+[WIP]
 
 ## License
 

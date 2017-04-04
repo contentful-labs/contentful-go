@@ -1,0 +1,7 @@
+language: go
+
+install:
+  - make get-deps-tests
+
+script:
+  - make coverall

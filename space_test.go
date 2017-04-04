@@ -3,12 +3,96 @@ package contentful
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
+
+func ExampleSpacesService_Get() {
+	cma := NewCMA("cma-token")
+
+	space, err := cma.Spaces.Get("space-id")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println(space.Name)
+}
+
+func ExampleSpacesService_List() {
+	cma := NewCMA("cma-token")
+	collection, err := cma.Spaces.List().Next()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	spaces := collection.ToSpace()
+	for _, space := range spaces {
+		fmt.Println(space.Sys.ID, space.Name)
+	}
+}
+
+func ExampleSpacesService_Upsert_create() {
+	cma := NewCMA("cma-token")
+
+	space := &Space{
+		Name:          "space-name",
+		DefaultLocale: "en-US",
+	}
+
+	err := cma.Spaces.Upsert(space)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func ExampleSpacesService_Upsert_update() {
+	cma := NewCMA("cma-token")
+
+	space, err := cma.Spaces.Get("space-id")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	space.Name = "modified"
+	err = cma.Spaces.Upsert(space)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func ExampleSpacesService_Delete() {
+	cma := NewCMA("cma-token")
+
+	space, err := cma.Spaces.Get("space-id")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = cma.Spaces.Delete(space)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func ExampleSpacesService_Delete_all() {
+	cma := NewCMA("cma-token")
+
+	collection, err := cma.Spaces.List().Next()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for _, space := range collection.ToSpace() {
+		err := cma.Spaces.Delete(space)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+}
 
 func TestSpaceSaveForCreate(t *testing.T) {
 	assert := assert.New(t)

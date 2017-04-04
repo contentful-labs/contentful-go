@@ -3,12 +3,148 @@ package contentful
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
+
+func ExampleContentTypesService_Get() {
+	cma := NewCMA("cma-token")
+
+	contentType, err := cma.ContentTypes.Get("space-id", "content-type-id")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println(contentType.Name)
+}
+
+func ExampleContentTypesService_List() {
+	cma := NewCMA("cma-token")
+
+	collection, err := cma.ContentTypes.List("space-id").Next()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	contentTypes := collection.ToContentType()
+
+	for _, contentType := range contentTypes {
+		fmt.Println(contentType.Sys.ID, contentType.Sys.PublishedAt)
+	}
+}
+
+func ExampleContentTypesService_Upsert_create() {
+	cma := NewCMA("cma-token")
+
+	contentType := &ContentType{
+		Name:         "test content type",
+		DisplayField: "field1_id",
+		Description:  "content type description",
+		Fields: []*Field{
+			&Field{
+				ID:       "field1_id",
+				Name:     "field1",
+				Type:     "Symbol",
+				Required: false,
+				Disabled: false,
+			},
+			&Field{
+				ID:       "field2_id",
+				Name:     "field2",
+				Type:     "Symbol",
+				Required: false,
+				Disabled: true,
+			},
+		},
+	}
+
+	err := cma.ContentTypes.Upsert("space-id", contentType)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func ExampleContentTypesService_Upsert_update() {
+	cma := NewCMA("cma-token")
+
+	contentType, err := cma.ContentTypes.Get("space-id", "content-type-id")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	contentType.Name = "modified content type name"
+
+	err = cma.ContentTypes.Upsert("space-id", contentType)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func ExampleContentTypesService_Activate() {
+	cma := NewCMA("cma-token")
+
+	contentType, err := cma.ContentTypes.Get("space-id", "content-type-id")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = cma.ContentTypes.Activate("space-id", contentType)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func ExampleContentTypesService_Deactivate() {
+	cma := NewCMA("cma-token")
+
+	contentType, err := cma.ContentTypes.Get("space-id", "content-type-id")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = cma.ContentTypes.Deactivate("space-id", contentType)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func ExampleContentTypesService_Delete() {
+	cma := NewCMA("cma-token")
+
+	contentType, err := cma.ContentTypes.Get("space-id", "content-type-id")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = cma.ContentTypes.Delete("space-id", contentType)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func ExampleContentTypesService_Delete_allDrafts() {
+	cma := NewCMA("cma-token")
+
+	collection, err := cma.ContentTypes.List("space-id").Next()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	contentTypes := collection.ToContentType()
+
+	for _, contentType := range contentTypes {
+		if contentType.Sys.PublishedAt == "" {
+			err := cma.ContentTypes.Delete("space-id", contentType)
+			if err != nil {
+				log.Fatal(err)
+			}
+		}
+	}
+}
 
 func TestContentTypeSaveForCreate(t *testing.T) {
 	var err error
