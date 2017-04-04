@@ -77,6 +77,18 @@ func contentTypeFromTestData(fileName string) (*ContentType, error) {
 	return &ct, nil
 }
 
+func localeFromTestData(fileName string) (*Locale, error) {
+	content := readTestData(fileName)
+
+	var locale Locale
+	err := json.NewDecoder(strings.NewReader(content)).Decode(&locale)
+	if err != nil {
+		return nil, err
+	}
+
+	return &locale, nil
+}
+
 func setup() {
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fixture := strings.Replace(r.URL.Path, "/", "-", -1)
