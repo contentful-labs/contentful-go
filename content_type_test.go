@@ -146,6 +146,92 @@ func ExampleContentTypesService_Delete_allDrafts() {
 	}
 }
 
+func TestContentTypesServiceList(t *testing.T) {
+	var err error
+	assert := assert.New(t)
+
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(r.Method, "GET")
+		assert.Equal(r.URL.Path, "/spaces/"+spaceID+"/content_types")
+
+		checkHeaders(r, assert)
+
+		w.WriteHeader(200)
+		fmt.Fprintln(w, readTestData("content_types.json"))
+	})
+
+	// test server
+	server := httptest.NewServer(handler)
+	defer server.Close()
+
+	// cma client
+	cma = NewCMA(CMAToken)
+	cma.BaseURL = server.URL
+
+	_, err = cma.ContentTypes.List(spaceID).Next()
+	assert.Nil(err)
+}
+
+func TestContentTypesServiceActivate(t *testing.T) {
+	var err error
+	assert := assert.New(t)
+
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(r.Method, "PUT")
+		assert.Equal(r.URL.Path, "/spaces/"+spaceID+"/content_types/63Vgs0BFK0USe4i2mQUGK6/published")
+
+		checkHeaders(r, assert)
+
+		w.WriteHeader(200)
+		fmt.Fprintln(w, readTestData("content_type.json"))
+	})
+
+	// test server
+	server := httptest.NewServer(handler)
+	defer server.Close()
+
+	// cma client
+	cma = NewCMA(CMAToken)
+	cma.BaseURL = server.URL
+
+	// test content type
+	ct, err := contentTypeFromTestData("content_type.json")
+	assert.Nil(err)
+
+	err = cma.ContentTypes.Activate(spaceID, ct)
+	assert.Nil(err)
+}
+
+func TestContentTypesServiceDeactivate(t *testing.T) {
+	var err error
+	assert := assert.New(t)
+
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(r.Method, "DELETE")
+		assert.Equal(r.URL.Path, "/spaces/"+spaceID+"/content_types/63Vgs0BFK0USe4i2mQUGK6/published")
+
+		checkHeaders(r, assert)
+
+		w.WriteHeader(200)
+		fmt.Fprintln(w, readTestData("content_type.json"))
+	})
+
+	// test server
+	server := httptest.NewServer(handler)
+	defer server.Close()
+
+	// cma client
+	cma = NewCMA(CMAToken)
+	cma.BaseURL = server.URL
+
+	// test content type
+	ct, err := contentTypeFromTestData("content_type.json")
+	assert.Nil(err)
+
+	err = cma.ContentTypes.Deactivate(spaceID, ct)
+	assert.Nil(err)
+}
+
 func TestContentTypeSaveForCreate(t *testing.T) {
 	var err error
 	assert := assert.New(t)
