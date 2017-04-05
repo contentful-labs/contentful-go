@@ -21,7 +21,7 @@ func TestLocalesServiceList(t *testing.T) {
 		checkHeaders(r, assert)
 
 		w.WriteHeader(200)
-		fmt.Fprintln(w, string(readTestData("spaces.json")))
+		fmt.Fprintln(w, readTestData("locales.json"))
 	})
 
 	// test server

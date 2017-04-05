@@ -94,6 +94,64 @@ func ExampleSpacesService_Delete_all() {
 	}
 }
 
+func TestSpacesServiceList(t *testing.T) {
+	var err error
+	assert := assert.New(t)
+
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(r.Method, "GET")
+		assert.Equal(r.URL.Path, "/spaces")
+
+		checkHeaders(r, assert)
+
+		w.WriteHeader(200)
+		fmt.Fprintln(w, readTestData("spaces.json"))
+	})
+
+	// test server
+	server := httptest.NewServer(handler)
+	defer server.Close()
+
+	// cma client
+	cma = NewCMA(CMAToken)
+	cma.BaseURL = server.URL
+
+	collection, err := cma.Spaces.List().Next()
+	assert.Nil(err)
+
+	spaces := collection.ToSpace()
+	assert.Equal(2, len(spaces))
+	assert.Equal("id1", spaces[0].Sys.ID)
+	assert.Equal("id2", spaces[1].Sys.ID)
+}
+
+func TestSpacesServiceGet(t *testing.T) {
+	var err error
+	assert := assert.New(t)
+
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(r.Method, "GET")
+		assert.Equal(r.URL.Path, "/spaces/"+spaceID)
+
+		checkHeaders(r, assert)
+
+		w.WriteHeader(200)
+		fmt.Fprintln(w, readTestData("space-1.json"))
+	})
+
+	// test server
+	server := httptest.NewServer(handler)
+	defer server.Close()
+
+	// cma client
+	cma = NewCMA(CMAToken)
+	cma.BaseURL = server.URL
+
+	space, err := cma.Spaces.Get(spaceID)
+	assert.Nil(err)
+	assert.Equal("id1", space.Sys.ID)
+}
+
 func TestSpaceSaveForCreate(t *testing.T) {
 	assert := assert.New(t)
 

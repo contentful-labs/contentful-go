@@ -18,11 +18,14 @@ import (
 )
 
 var (
-	server   *httptest.Server
-	cma      *Contentful
-	c        *Contentful
-	CMAToken = "b4c0n73n7fu1"
-	spaceID  = "id1"
+	server         *httptest.Server
+	cma            *Contentful
+	c              *Contentful
+	CMAToken       = "b4c0n73n7fu1"
+	CDAToken       = "cda-token"
+	CPAToken       = "cpa-token"
+	spaceID        = "id1"
+	organizationID = "org-id"
 )
 
 func readTestData(fileName string) string {
@@ -132,6 +135,44 @@ func teardown() {
 	c = nil
 }
 
+func TestContentfulNewCMA(t *testing.T) {
+	assert := assert.New(t)
+
+	cma := NewCMA(CMAToken)
+	assert.IsType(Contentful{}, *cma)
+	assert.Equal("https://api.contentful.com", cma.BaseURL)
+	assert.Equal("CMA", cma.api)
+	assert.Equal(CMAToken, cma.token)
+}
+
+func TestContentfulNewCDA(t *testing.T) {
+	assert := assert.New(t)
+
+	cda := NewCDA(CDAToken)
+	assert.IsType(Contentful{}, *cda)
+	assert.Equal("https://cda.contentful.com", cda.BaseURL)
+	assert.Equal("CDA", cda.api)
+	assert.Equal(CDAToken, cda.token)
+}
+
+func TestContentfulNewCPA(t *testing.T) {
+	assert := assert.New(t)
+
+	cpa := NewCPA(CPAToken)
+	assert.IsType(Contentful{}, *cpa)
+	assert.Equal("https://preview.contentful.com", cpa.BaseURL)
+	assert.Equal("CPA", cpa.api)
+	assert.Equal(CPAToken, cpa.token)
+}
+
+func TestContentfulSetOrganization(t *testing.T) {
+	assert := assert.New(t)
+
+	cma := NewCMA(CMAToken)
+	cma.SetOrganization(organizationID)
+	assert.Equal(organizationID, cma.Headers["X-Contentful-Organization"])
+}
+
 func TestNewRequest(t *testing.T) {
 	setup()
 	defer teardown()
@@ -216,39 +257,6 @@ func TestHandleError(t *testing.T) {
 	assert.Equal(req, err.(AccessTokenInvalidError).APIError.req)
 	assert.Equal(res, err.(AccessTokenInvalidError).APIError.res)
 	assert.Equal(&errResponse, err.(AccessTokenInvalidError).APIError.err)
-}
-
-func TestGetSpace(t *testing.T) {
-	setup()
-	defer teardown()
-
-	assert := assert.New(t)
-
-	space, err := c.Spaces.Get(spaceID)
-	if err != nil {
-		assert.Fail(err.Error())
-	}
-
-	assert.Equal("Space", space.Sys.Type)
-	assert.Equal("id1", space.Sys.ID)
-	assert.Equal("Contentful Example API", space.Name)
-}
-
-func TestGetSpaces(t *testing.T) {
-	setup()
-	defer teardown()
-
-	assert := assert.New(t)
-
-	col, err := c.Spaces.List().Next()
-	if err != nil {
-		assert.Fail(err.Error())
-	}
-	spaces := col.ToSpace()
-
-	assert.Equal("Space", spaces[0].Sys.Type)
-	assert.Equal("id1", spaces[0].Sys.ID)
-	assert.Equal("Contentful Example API", spaces[0].Name)
 }
 
 func TestBackoffForPerSecondLimiting(t *testing.T) {
