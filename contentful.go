@@ -45,8 +45,9 @@ func NewCMA(token string) *Contentful {
 		token:  token,
 		Debug:  false,
 		Headers: map[string]string{
-			"Authorization": "Bearer " + token,
-			"Content-Type":  "application/vnd.contentful.management.v1+json",
+			"Authorization":           fmt.Sprintf("Bearer %s", token),
+			"Content-Type":            "application/vnd.contentful.management.v1+json",
+			"X-Contentful-User-Agent": fmt.Sprintf("contentful-go/%s", Version),
 		},
 		BaseURL: "https://api.contentful.com",
 	}
@@ -70,7 +71,9 @@ func NewCDA(token string) *Contentful {
 		token:  token,
 		Debug:  false,
 		Headers: map[string]string{
-			"Authorization": "Bearer " + token,
+			"Authorization":           "Bearer " + token,
+			"Content-Type":            "application/vnd.contentful.delivery.v1+json",
+			"X-Contentful-User-Agent": fmt.Sprintf("contentful-go/%s", Version),
 		},
 		BaseURL: "https://cda.contentful.com",
 	}
