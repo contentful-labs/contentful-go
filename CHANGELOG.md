@@ -1,3 +1,12 @@
+v0.2.0 (2017-04-12)
+===
+* Godoc style examples
+* [Added] Query.go tests
+* [Added] Locale resource tests
+* [Added] ContentType tests
+* [Added] Missing space resource tests
+* [Added] User-Agent for api requests
+
 v0.1.1 (2017-03-31)
 ===
 
