@@ -153,7 +153,7 @@ func TestContentfulNewCDA(t *testing.T) {
 
 	cda := NewCDA(CDAToken)
 	assert.IsType(Contentful{}, *cda)
-	assert.Equal("https://cda.contentful.com", cda.BaseURL)
+	assert.Equal("https://cdn.contentful.com", cda.BaseURL)
 	assert.Equal("CDA", cda.api)
 	assert.Equal(CDAToken, cda.token)
 	assert.Equal(fmt.Sprintf("Bearer %s", CDAToken), cda.Headers["Authorization"])
