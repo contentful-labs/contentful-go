@@ -75,7 +75,7 @@ func NewCDA(token string) *Contentful {
 			"Content-Type":            "application/vnd.contentful.delivery.v1+json",
 			"X-Contentful-User-Agent": fmt.Sprintf("contentful-go/%s", Version),
 		},
-		BaseURL: "https://cda.contentful.com",
+		BaseURL: "https://cdn.contentful.com",
 	}
 
 	c.Spaces = &SpacesService{c: c}
