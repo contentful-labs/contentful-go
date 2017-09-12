@@ -69,7 +69,7 @@ func (col *Collection) ToContentType() []*ContentType {
 	return contentTypes
 }
 
-// ToSpace cast Items to ContentType model
+// ToSpace cast Items to Space model
 func (col *Collection) ToSpace() []*Space {
 	var spaces []*Space
 
@@ -77,6 +77,16 @@ func (col *Collection) ToSpace() []*Space {
 	json.NewDecoder(bytes.NewReader(byteArray)).Decode(&spaces)
 
 	return spaces
+}
+
+// ToEntry cast Items to Entry model
+func (col *Collection) ToEntry() []*Entry {
+	var entries []*Entry
+
+	byteArray, _ := json.Marshal(col.Items)
+	json.NewDecoder(bytes.NewReader(byteArray)).Decode(&entries)
+
+	return entries
 }
 
 // ToLocale cast Items to Locale model
