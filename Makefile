@@ -9,31 +9,18 @@ GO_DEPS=$(GO_CMD) get -d -v
 GO_DEPS_UPDATE=$(GO_CMD) get -d -v -u
 GO_VET=$(GO_CMD) vet
 GO_FMT=$(GO_CMD) fmt
-GO_LINT=golint
 
-COVERAGE_DIR=.cover
-COVERAGE_PROFILE=$(COVERAGE_DIR)/cover.out
-COVERAGE_MODE=atomic
+.PHONY: all test lint dep
 
-.PHONY: all test coverage coverall lint
-
-all: test
+all: dep test lint
 
 test:
-	$(GO_TEST)
-
-coverage:
-	@rm -rf $(COVERAGE_DIR)
-	@mkdir $(COVERAGE_DIR)
-	$(GO_TEST) -covermode=$(COVERAGE_MODE) -coverprofile=$(COVERAGE_PROFILE)
-
-coverall: coverage
-	goveralls -coverprofile=$(COVERAGE_PROFILE)
+	./tools/test.sh
 
 lint:
-	@$(GO_LINT)
+	./tools/lint.sh
 
-get-deps-tests:
-	$(GO_DEPS) github.com/stretchr/testify
-	$(GO_DEPS) github.com/golang/lint
-	$(GO_DEPS) github.com/mattn/goveralls
+dep:
+	curl -fsSL -o /tmp/dep https://github.com/golang/dep/releases/download/v0.3.2/dep-linux-amd64
+	chmod +x /tmp/dep
+	/tmp/dep ensure -vendor-only

@@ -97,11 +97,7 @@ func (service *WebhooksService) Upsert(spaceID string, webhook *Webhook) error {
 
 	req.Header.Set("X-Contentful-Version", strconv.Itoa(webhook.GetVersion()))
 
-	if ok := service.c.do(req, webhook); ok != nil {
-		return ok
-	}
-
-	return nil
+	return service.c.do(req, webhook)
 }
 
 // Delete the webhook
@@ -117,9 +113,5 @@ func (service *WebhooksService) Delete(spaceID string, webhook *Webhook) error {
 	version := strconv.Itoa(webhook.Sys.Version)
 	req.Header.Set("X-Contentful-Version", version)
 
-	if err = service.c.do(req, nil); err != nil {
-		return err
-	}
-
-	return nil
+	return service.c.do(req, nil)
 }

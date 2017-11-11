@@ -88,7 +88,14 @@ func (e RateLimitExceededError) Error() string {
 	return e.APIError.err.Message
 }
 
+// BadRequestError error model for bad request responses
 type BadRequestError struct{}
+
+// InvalidQueryError error model for invalid query responses
 type InvalidQueryError struct{}
+
+// AccessDeniedError error model for access denied responses
 type AccessDeniedError struct{}
+
+// ServerError error model for server error responses
 type ServerError struct{}

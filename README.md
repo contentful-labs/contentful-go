@@ -1,4 +1,4 @@
-[![Coverage Status](https://coveralls.io/repos/github/contentful-labs/contentful-go/badge.svg?branch=ci)](https://coveralls.io/github/contentful-labs/contentful-go?branch=ci)
+[![codecov](https://codecov.io/gh/contentful-labs/contentful-go/branch/master/graph/badge.svg)](https://codecov.io/gh/contentful-labs/contentful-go)
 [![Godoc](https://img.shields.io/badge/godoc-Reference-brightgreen.svg?style=flat)](https://godoc.org/github.com/contentful-labs/contentful-go)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Build Status](https://travis-ci.com/contentful-labs/contentful-go.svg?token=ppF3HxXy28XU9AwHHiGX&branch=master)](https://travis-ci.com/contentful-labs/contentful-go)

@@ -20,14 +20,29 @@ type ContentType struct {
 }
 
 const (
-	FieldTypeText     = "Text"
-	FieldTypeArray    = "Array"
-	FieldTypeLink     = "Link"
-	FieldTypeInteger  = "Integer"
+	// FieldTypeText content type field type for text data
+	FieldTypeText = "Text"
+
+	// FieldTypeArray content type field type for array data
+	FieldTypeArray = "Array"
+
+	// FieldTypeLink content type field type for link data
+	FieldTypeLink = "Link"
+
+	// FieldTypeInteger content type field type for integer data
+	FieldTypeInteger = "Integer"
+
+	// FieldTypeLocation content type field type for location data
 	FieldTypeLocation = "Location"
-	FieldTypeBoolean  = "Boolean"
-	FieldTypeDate     = "Date"
-	FieldTypeObject   = "Object"
+
+	// FieldTypeBoolean content type field type for boolean data
+	FieldTypeBoolean = "Boolean"
+
+	// FieldTypeDate content type field type for date data
+	FieldTypeDate = "Date"
+
+	// FieldTypeObject content type field type for object data
+	FieldTypeObject = "Object"
 )
 
 // Field model
@@ -109,6 +124,7 @@ func (field *Field) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+// ParseValidations converts json representation to go struct
 func ParseValidations(data []interface{}) (validations []FieldValidation, err error) {
 	for _, value := range data {
 		var validation map[string]interface{}
@@ -286,6 +302,7 @@ func (service *ContentTypesService) List(spaceID string) *Collection {
 	return col
 }
 
+// Get fetched a content type specified by `contentTypeID`
 func (service *ContentTypesService) Get(spaceID, contentTypeID string) (*ContentType, error) {
 	path := fmt.Sprintf("/spaces/%s/content_types/%s", spaceID, contentTypeID)
 	method := "GET"
@@ -328,11 +345,7 @@ func (service *ContentTypesService) Upsert(spaceID string, ct *ContentType) erro
 
 	req.Header.Set("X-Contentful-Version", strconv.Itoa(ct.GetVersion()))
 
-	if err = service.c.do(req, ct); err != nil {
-		return err
-	}
-
-	return nil
+	return service.c.do(req, ct)
 }
 
 // Delete the content_type
@@ -348,11 +361,7 @@ func (service *ContentTypesService) Delete(spaceID string, ct *ContentType) erro
 	version := strconv.Itoa(ct.Sys.Version)
 	req.Header.Set("X-Contentful-Version", version)
 
-	if err = service.c.do(req, nil); err != nil {
-		return err
-	}
-
-	return nil
+	return service.c.do(req, nil)
 }
 
 // Activate the contenttype, a.k.a publish
@@ -368,11 +377,7 @@ func (service *ContentTypesService) Activate(spaceID string, ct *ContentType) er
 	version := strconv.Itoa(ct.Sys.Version)
 	req.Header.Set("X-Contentful-Version", version)
 
-	if err = service.c.do(req, ct); err != nil {
-		return err
-	}
-
-	return nil
+	return service.c.do(req, ct)
 }
 
 // Deactivate the contenttype, a.k.a unpublish
@@ -388,10 +393,5 @@ func (service *ContentTypesService) Deactivate(spaceID string, ct *ContentType) 
 	version := strconv.Itoa(ct.Sys.Version)
 	req.Header.Set("X-Contentful-Version", version)
 
-	if err = service.c.do(req, ct); err != nil {
-		fmt.Println(err)
-		return err
-	}
-
-	return nil
+	return service.c.do(req, ct)
 }

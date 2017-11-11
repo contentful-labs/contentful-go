@@ -14,18 +14,41 @@ type FieldValidationLink struct {
 }
 
 const (
-	MimeTypeAttachment   = "attachment"
-	MimeTypePlainText    = "plaintext"
-	MimeTypeImage        = "image"
-	MimeTypeAudio        = "audio"
-	MimeTypeVideo        = "video"
-	MimeTypeRichText     = "richtext"
+	// MimeTypeAttachment mime type validation for content type field
+	MimeTypeAttachment = "attachment"
+
+	// MimeTypePlainText mime type validation for content type field
+	MimeTypePlainText = "plaintext"
+
+	// MimeTypeImage mime type validation for content type field
+	MimeTypeImage = "image"
+
+	// MimeTypeAudio mime type validation for content type field
+	MimeTypeAudio = "audio"
+
+	// MimeTypeVideo mime type validation for content type field
+	MimeTypeVideo = "video"
+
+	// MimeTypeRichText mime type validation for content type field
+	MimeTypeRichText = "richtext"
+
+	// MimeTypePresentation mime type validation for content type field
 	MimeTypePresentation = "presentation"
-	MimeTypeSpreadSheet  = "spreadsheet"
-	MimeTypePDF          = "pdfdocument"
-	MimeTypeArchive      = "archive"
-	MimeTypeCode         = "code"
-	MimeTypeMarkup       = "markup"
+
+	// MimeTypeSpreadSheet mime type validation for content type field
+	MimeTypeSpreadSheet = "spreadsheet"
+
+	// MimeTypePDF mime type validation for content type field
+	MimeTypePDF = "pdfdocument"
+
+	// MimeTypeArchive mime type validation for content type field
+	MimeTypeArchive = "archive"
+
+	// MimeTypeCode mime type validation for content type field
+	MimeTypeCode = "code"
+
+	// MimeTypeMarkup mime type validation for content type field
+	MimeTypeMarkup = "markup"
 )
 
 // FieldValidationMimeType model
@@ -202,14 +225,29 @@ type FieldValidationSize struct {
 }
 
 const (
-	FieldValidationRegexPatternEmail         = `^\w[\w.-]*@([\w-]+\.)+[\w-]+$`
-	FieldValidationRegexPatternURL           = `^(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?$`
-	FieldValidationRegexPatternUSDate        = `^(0?[1-9]|[12][0-9]|3[01])[- \/.](0?[1-9]|1[012])[- \/.](19|20)?\d\d$`
-	FieldValidationRegexPatternEuorpeanDate  = `^(0?[1-9]|[12][0-9]|3[01])[- \/.](0?[1-9]|1[012])[- \/.](19|20)?\d\d$`
-	FieldValidationRegexPattern12HourTime    = `^(0?[1-9]|1[012]):[0-5][0-9](:[0-5][0-9])?\s*[aApP][mM]$`
-	FieldValidationRegexPattern24HourTime    = `^(0?[0-9]|1[0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?$`
+	// FieldValidationRegexPatternEmail email validation
+	FieldValidationRegexPatternEmail = `^\w[\w.-]*@([\w-]+\.)+[\w-]+$`
+
+	// FieldValidationRegexPatternURL url validation
+	FieldValidationRegexPatternURL = `^(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?$`
+
+	// FieldValidationRegexPatternUSDate us date validation
+	FieldValidationRegexPatternUSDate = `^(0?[1-9]|[12][0-9]|3[01])[- \/.](0?[1-9]|1[012])[- \/.](19|20)?\d\d$`
+
+	// FieldValidationRegexPatternEuorpeanDate euorpean date validation
+	FieldValidationRegexPatternEuorpeanDate = `^(0?[1-9]|[12][0-9]|3[01])[- \/.](0?[1-9]|1[012])[- \/.](19|20)?\d\d$`
+
+	// FieldValidationRegexPattern12HourTime 12-hour time validation
+	FieldValidationRegexPattern12HourTime = `^(0?[1-9]|1[012]):[0-5][0-9](:[0-5][0-9])?\s*[aApP][mM]$`
+
+	// FieldValidationRegexPattern24HourTime 24-hour time validation
+	FieldValidationRegexPattern24HourTime = `^(0?[0-9]|1[0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?$`
+
+	// FieldValidationRegexPatternUSPhoneNumber us phone number validation
 	FieldValidationRegexPatternUSPhoneNumber = `^\d[ -.]?\(?\d\d\d\)?[ -.]?\d\d\d[ -.]?\d\d\d\d$`
-	FieldValidationRegexPatternUSZipCode     = `^\d{5}$|^\d{5}-\d{4}$}`
+
+	// FieldValidationRegexPatternUSZipCode us zip code validation
+	FieldValidationRegexPatternUSZipCode = `^\d{5}$|^\d{5}-\d{4}$}`
 )
 
 // Regex model

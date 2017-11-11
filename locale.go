@@ -94,11 +94,7 @@ func (service *LocalesService) Delete(spaceID string, locale *Locale) error {
 	version := strconv.Itoa(locale.Sys.Version)
 	req.Header.Set("X-Contentful-Version", version)
 
-	if err = service.c.do(req, nil); err != nil {
-		return err
-	}
-
-	return nil
+	return service.c.do(req, nil)
 }
 
 // Upsert updates or creates a new locale entity
@@ -126,9 +122,5 @@ func (service *LocalesService) Upsert(spaceID string, locale *Locale) error {
 
 	req.Header.Set("X-Contentful-Version", strconv.Itoa(locale.GetVersion()))
 
-	if ok := service.c.do(req, locale); ok != nil {
-		return ok
-	}
-
-	return nil
+	return service.c.do(req, locale)
 }
