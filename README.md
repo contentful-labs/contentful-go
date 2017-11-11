@@ -53,7 +53,7 @@ cma.Debug = true
 
 #### Dependencies
 
-`contentful-go` stores its dependencies under `vendor` folder and uses [`dep`](https://github.com/golang/dep) to manage the vendoring process. Dependencies in `vendor` folder will be loaded automatically by [Go 1.6+](https://golang.org/cmd/go/#hdr-Vendor_Directories).
+`contentful-go` stores its dependencies under `vendor` folder and uses [`dep`](https://github.com/golang/dep) to manage dependency resolutions. Dependencies in `vendor` folder will be loaded automatically by [Go 1.6+](https://golang.org/cmd/go/#hdr-Vendor_Directories). To install the dependencies, run `dep ensure`, for more options and documentation please visit [`dep`](https://github.com/golang/dep).
 
 # Using the SDK
 
