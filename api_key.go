@@ -112,11 +112,7 @@ func (service *APIKeyService) Upsert(spaceID string, apiKey *APIKey) error {
 
 	req.Header.Set("X-Contentful-Version", strconv.Itoa(apiKey.GetVersion()))
 
-	if ok := service.c.do(req, apiKey); ok != nil {
-		return ok
-	}
-
-	return nil
+	return service.c.do(req, apiKey)
 }
 
 // Delete deletes a sinlge api key entity
@@ -132,9 +128,5 @@ func (service *APIKeyService) Delete(spaceID string, apiKey *APIKey) error {
 	version := strconv.Itoa(apiKey.Sys.Version)
 	req.Header.Set("X-Contentful-Version", version)
 
-	if err = service.c.do(req, nil); err != nil {
-		return err
-	}
-
-	return nil
+	return service.c.do(req, nil)
 }

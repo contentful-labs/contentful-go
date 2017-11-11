@@ -1,7 +1,12 @@
 language: go
+dist: trusty
 
 install:
-  - make get-deps-tests
+  - make dep
 
 script:
-  - make coverall
+  - make test
+  - make lint
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash) -t $CODECOV_TOKEN

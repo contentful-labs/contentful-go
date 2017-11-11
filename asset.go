@@ -193,11 +193,7 @@ func (service *AssetsService) Upsert(spaceID string, asset *Asset) error {
 
 	req.Header.Set("X-Contentful-Version", strconv.Itoa(asset.GetVersion()))
 
-	if err = service.c.do(req, asset); err != nil {
-		return err
-	}
-
-	return nil
+	return service.c.do(req, asset)
 }
 
 // Delete sends delete request
@@ -213,11 +209,7 @@ func (service *AssetsService) Delete(spaceID string, asset *Asset) error {
 	version := strconv.Itoa(asset.Sys.Version)
 	req.Header.Set("X-Contentful-Version", version)
 
-	if err = service.c.do(req, nil); err != nil {
-		return err
-	}
-
-	return nil
+	return service.c.do(req, nil)
 }
 
 // Process the asset
@@ -233,11 +225,7 @@ func (service *AssetsService) Process(spaceID string, asset *Asset) error {
 	version := strconv.Itoa(asset.Sys.Version)
 	req.Header.Set("X-Contentful-Version", version)
 
-	if err = service.c.do(req, nil); err != nil {
-		return err
-	}
-
-	return nil
+	return service.c.do(req, nil)
 }
 
 // Publish published the asset
@@ -253,9 +241,5 @@ func (service *AssetsService) Publish(spaceID string, asset *Asset) error {
 	version := strconv.Itoa(asset.Sys.Version)
 	req.Header.Set("X-Contentful-Version", version)
 
-	if err = service.c.do(req, asset); err != nil {
-		return err
-	}
-
-	return nil
+	return service.c.do(req, asset)
 }

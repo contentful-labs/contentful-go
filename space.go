@@ -92,11 +92,7 @@ func (service *SpacesService) Upsert(space *Space) error {
 
 	req.Header.Set("X-Contentful-Version", strconv.Itoa(space.GetVersion()))
 
-	if ok := service.c.do(req, space); ok != nil {
-		return ok
-	}
-
-	return nil
+	return service.c.do(req, space)
 }
 
 // Delete the given space
@@ -112,9 +108,5 @@ func (service *SpacesService) Delete(space *Space) error {
 	version := strconv.Itoa(space.Sys.Version)
 	req.Header.Set("X-Contentful-Version", version)
 
-	if err = service.c.do(req, nil); err != nil {
-		return err
-	}
-
-	return nil
+	return service.c.do(req, nil)
 }

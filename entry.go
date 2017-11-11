@@ -25,7 +25,7 @@ func (entry *Entry) GetVersion() int {
 	return version
 }
 
-// GetKey returns the entry's keys
+// GetEntryKey returns the entry's keys
 func (service *EntriesService) GetEntryKey(entry *Entry, key string) (*EntryField, error) {
 	ef := EntryField{
 		value: entry.Fields[key],

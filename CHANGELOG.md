@@ -1,3 +1,14 @@
+v0.3.0 (2017-11-11)
+===
+* `~` use codecov as coverage service
+* `+` `golint` is added to the CI process
+* `~` `dep` is updated to the latest version
+* `x` `vendor` folder is not under version control
+* `~` `makefile` simplifications
+* `+` testing and linting is now handled by scripts under `tools` folder
+* `~` cosmetic changes in codebase to make linter happy
+
+
 v0.2.0 (2017-04-12)
 ===
 * Godoc style examples
