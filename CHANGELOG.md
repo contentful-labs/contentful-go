@@ -1,3 +1,7 @@
+v0.3.1 (2017-11-28)
+===
+* `~` sdk version header format fixed.
+
 v0.3.0 (2017-11-11)
 ===
 * `~` use codecov as coverage service
