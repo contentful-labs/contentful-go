@@ -47,7 +47,7 @@ func NewCMA(token string) *Contentful {
 		Headers: map[string]string{
 			"Authorization":           fmt.Sprintf("Bearer %s", token),
 			"Content-Type":            "application/vnd.contentful.management.v1+json",
-			"X-Contentful-User-Agent": fmt.Sprintf("contentful-go/%s", Version),
+			"X-Contentful-User-Agent": fmt.Sprintf("sdk contentful.go/%s", Version),
 		},
 		BaseURL: "https://api.contentful.com",
 	}
