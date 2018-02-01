@@ -87,7 +87,7 @@ if err != nil {
 }
 
 collection := cma.ContentTypes.List(space.Sys.ID)
-collection, err := collection.Next()
+collection, err = collection.Next()
 if err != nil {
   log.Fatal(err)
 }
