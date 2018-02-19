@@ -13,7 +13,7 @@ func (ef *EntryField) String() string {
 	return ef.value.(string)
 }
 
-//LString returns the given lovale
+//LString returns the given locale
 func (ef *EntryField) LString(locale string) string {
 	m := ef.value.(map[string]interface{})
 

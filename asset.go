@@ -76,6 +76,8 @@ func (asset *Asset) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON for custom json unmarshaling
 func (asset *Asset) UnmarshalJSON(data []byte) error {
+	type Alias *Asset
+
 	var payload map[string]interface{}
 	if err := json.Unmarshal(data, &payload); err != nil {
 		return err
@@ -90,7 +92,8 @@ func (asset *Asset) UnmarshalJSON(data []byte) error {
 
 	if localized == false {
 		asset.Sys = &Sys{}
-		if err := json.Unmarshal([]byte(payload["sys"].(string)), asset.Sys); err != nil {
+		b, _ := json.Marshal(payload["sys"])
+		if err := json.Unmarshal(b, asset.Sys); err != nil {
 			return err
 		}
 
@@ -115,7 +118,7 @@ func (asset *Asset) UnmarshalJSON(data []byte) error {
 			return err
 		}
 	} else {
-		if err := json.Unmarshal(data, asset); err != nil {
+		if err := json.Unmarshal(data, Alias(asset)); err != nil {
 			return err
 		}
 	}
