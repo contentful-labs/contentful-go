@@ -3,6 +3,7 @@ package contentful
 import (
 	"fmt"
 	"net/url"
+	"strconv"
 )
 
 // EntriesService servıce
@@ -74,8 +75,9 @@ func (service *EntriesService) List(spaceID string) *Collection {
 func (service *EntriesService) Get(spaceID, entryID string) (*Entry, error) {
 	path := fmt.Sprintf("/spaces/%s/entries/%s", spaceID, entryID)
 	query := url.Values{}
+	method := "GET"
 
-	req, err := service.c.newRequest("GET", path, query, nil)
+	req, err := service.c.newRequest(method, path, query, nil)
 	if err != nil {
 		return &Entry{}, err
 	}
@@ -86,4 +88,49 @@ func (service *EntriesService) Get(spaceID, entryID string) (*Entry, error) {
 	}
 
 	return &entry, err
+}
+
+// Delete the entry
+func (service *EntriesService) Delete(spaceID string, entryID string) error {
+	path := fmt.Sprintf("/spaces/%s/entries/%s", spaceID, entryID)
+	method := "DELETE"
+
+	req, err := service.c.newRequest(method, path, nil, nil)
+	if err != nil {
+		return err
+	}
+
+	return service.c.do(req, nil)
+}
+
+// Activate the entry, a.k.a publish
+func (service *EntriesService) Activate(spaceID string, entry *Entry) error {
+	path := fmt.Sprintf("/spaces/%s/entries/%s/published", spaceID, entry.Sys.ID)
+	method := "PUT"
+
+	req, err := service.c.newRequest(method, path, nil, nil)
+	if err != nil {
+		return err
+	}
+
+	version := strconv.Itoa(entry.Sys.Version)
+	req.Header.Set("X-Contentful-Version", version)
+
+	return service.c.do(req, nil)
+}
+
+// Deactivate the entry, a.k.a unpublish
+func (service *EntriesService) Deactivate(spaceID string, entry *Entry) error {
+	path := fmt.Sprintf("/spaces/%s/entries/%s/published", spaceID, entry.Sys.ID)
+	method := "DELETE"
+
+	req, err := service.c.newRequest(method, path, nil, nil)
+	if err != nil {
+		return err
+	}
+
+	version := strconv.Itoa(entry.Sys.Version)
+	req.Header.Set("X-Contentful-Version", version)
+
+	return service.c.do(req, nil)
 }
