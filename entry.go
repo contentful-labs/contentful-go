@@ -103,8 +103,8 @@ func (service *EntriesService) Delete(spaceID string, entryID string) error {
 	return service.c.do(req, nil)
 }
 
-// Activate the entry, a.k.a publish
-func (service *EntriesService) Activate(spaceID string, entry *Entry) error {
+// Publish the entry
+func (service *EntriesService) Publish(spaceID string, entry *Entry) error {
 	path := fmt.Sprintf("/spaces/%s/entries/%s/published", spaceID, entry.Sys.ID)
 	method := "PUT"
 
@@ -119,8 +119,8 @@ func (service *EntriesService) Activate(spaceID string, entry *Entry) error {
 	return service.c.do(req, nil)
 }
 
-// Deactivate the entry, a.k.a unpublish
-func (service *EntriesService) Deactivate(spaceID string, entry *Entry) error {
+// Unpublish the entry
+func (service *EntriesService) Unpublish(spaceID string, entry *Entry) error {
 	path := fmt.Sprintf("/spaces/%s/entries/%s/published", spaceID, entry.Sys.ID)
 	method := "DELETE"
 
