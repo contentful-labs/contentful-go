@@ -1,6 +1,10 @@
 package contentful
 
-import "net/http"
+import (
+	"bytes"
+	"fmt"
+	"net/http"
+)
 
 // ErrorResponse model
 type ErrorResponse struct {
@@ -59,15 +63,16 @@ type ValidationFailedError struct {
 }
 
 func (e ValidationFailedError) Error() string {
-	msg := ""
+	msg := bytes.Buffer{}
+
 	for _, err := range e.APIError.err.Details.Errors {
 		if err.Name == "uniqueFieldIds" || err.Name == "uniqueFieldApiNames" {
-			return msg
-			// msg += err.Value["id"].(string) + " should be unique for " + err.Value["name"].(string) + "\n"
+			return msg.String()
 		}
+		msg.WriteString(fmt.Sprintf("%s\n", err.Details))
 	}
 
-	return msg
+	return msg.String()
 }
 
 // NotFoundError for 404 errors
