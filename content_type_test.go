@@ -387,6 +387,70 @@ func TestContentTypeSaveForUpdate(t *testing.T) {
 	assert.Equal(2, ct.Sys.Version)
 }
 
+func TestContentTypeCreateWithoutID(t *testing.T) {
+	var err error
+	assert := assert.New(t)
+
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(r.Method, "POST")
+		assert.Equal(r.RequestURI, "/spaces/id1/content_types")
+		checkHeaders(r, assert)
+
+		w.WriteHeader(200)
+		fmt.Fprintln(w, string(readTestData("content_type-updated.json")))
+	})
+
+	// test server
+	server := httptest.NewServer(handler)
+	defer server.Close()
+
+	// cma client
+	cma = NewCMA(CMAToken)
+	cma.BaseURL = server.URL
+
+	// test content type
+	ct := &ContentType{
+		Sys:  &Sys{},
+		Name: "MyContentType",
+	}
+
+	cma.ContentTypes.Upsert("id1", ct)
+	assert.Nil(err)
+}
+
+func TestContentTypeCreateWithID(t *testing.T) {
+	var err error
+	assert := assert.New(t)
+
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(r.Method, "PUT")
+		assert.Equal(r.RequestURI, "/spaces/id1/content_types/mycontenttype")
+		checkHeaders(r, assert)
+
+		w.WriteHeader(200)
+		fmt.Fprintln(w, string(readTestData("content_type-updated.json")))
+	})
+
+	// test server
+	server := httptest.NewServer(handler)
+	defer server.Close()
+
+	// cma client
+	cma = NewCMA(CMAToken)
+	cma.BaseURL = server.URL
+
+	// test content type
+	ct := &ContentType{
+		Sys: &Sys{
+			ID: "mycontenttype",
+		},
+		Name: "MyContentType",
+	}
+
+	cma.ContentTypes.Upsert("id1", ct)
+	assert.Nil(err)
+}
+
 func TestContentTypeDelete(t *testing.T) {
 	var err error
 	assert := assert.New(t)
