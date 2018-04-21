@@ -1,6 +1,8 @@
 package contentful
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"net/url"
 	"strconv"
@@ -9,11 +11,13 @@ import (
 // EntriesService servıce
 type EntriesService service
 
+type LocalizedField map[string]interface{}
+
 //Entry model
 type Entry struct {
 	locale string
-	Sys    *Sys `json:"sys"`
-	Fields map[string]interface{}
+	Sys    *Sys                      `json:"sys"`
+	Fields map[string]LocalizedField `json:"fields,omitempty"`
 }
 
 // GetVersion returns entity version
@@ -101,6 +105,44 @@ func (service *EntriesService) Delete(spaceID string, entryID string) error {
 	}
 
 	return service.c.do(req, nil)
+}
+
+// Upsert updates or creates a new entry
+func (service *EntriesService) Upsert(spaceID string, entry *Entry) error {
+	fieldsOnly := map[string]interface{}{
+		"fields": entry.Fields,
+	}
+
+	bytesArray, err := json.Marshal(fieldsOnly)
+	if err != nil {
+		return err
+	}
+
+	// Creating/updating an entry requires a content type to be provided
+	if entry.Sys.ContentType == nil {
+		return fmt.Errorf("creating/updating an entry requires a content type")
+	}
+
+	var path string
+	var method string
+
+	if entry.Sys != nil && entry.Sys.ID != "" {
+		path = fmt.Sprintf("/spaces/%s/entries/%s", spaceID, entry.Sys.ID)
+		method = "PUT"
+	} else {
+		path = fmt.Sprintf("/spaces/%s/entries", spaceID)
+		method = "POST"
+	}
+
+	req, err := service.c.newRequest(method, path, nil, bytes.NewReader(bytesArray))
+	if err != nil {
+		return err
+	}
+
+	req.Header.Set("X-Contentful-Version", strconv.Itoa(entry.GetVersion()))
+	req.Header.Set("X-Contentful-Content-Type", entry.Sys.ContentType.Sys.ID)
+
+	return service.c.do(req, entry)
 }
 
 // Publish the entry
