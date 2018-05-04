@@ -82,11 +82,13 @@ func (asset *Asset) UnmarshalJSON(data []byte) error {
 	}
 
 	fileName := payload["fields"].(map[string]interface{})["file"].(map[string]interface{})["fileName"]
-	localized := true
+	localized := false
 
 	if fileName == nil {
-		localized = false
+		localized = true
 	}
+
+	fmt.Println(localized)
 
 	if localized == false {
 		asset.Sys = &Sys{}
@@ -228,7 +230,7 @@ func (service *AssetsService) Process(spaceID string, asset *Asset) error {
 	return service.c.do(req, nil)
 }
 
-// Publish published the asset
+// Publish publishes the asset
 func (service *AssetsService) Publish(spaceID string, asset *Asset) error {
 	path := fmt.Sprintf("/spaces/%s/assets/%s/published", spaceID, asset.Sys.ID)
 	method := "PUT"

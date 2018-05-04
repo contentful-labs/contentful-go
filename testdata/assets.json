@@ -1,0 +1,107 @@
+{
+  "sys": {
+    "type": "Array"
+  },
+  "total": 3,
+  "skip": 0,
+  "limit": 100,
+  "items": [
+    {
+      "sys": {
+        "space": {
+          "sys": {
+            "type": "Link",
+            "linkType": "Space",
+            "id": "{{.SpaceID}}"
+          }
+        },
+        "id": "1x0xpXu4pSGS4OukSyWGUK",
+        "type": "Asset",
+        "createdAt": "2013-11-06T09:45:10.000Z",
+        "updatedAt": "2013-12-18T13:27:14.917Z",
+        "revision": 6,
+        "locale": "en-US"
+      },
+      "fields": {
+        "title": "Doge",
+        "description": "nice picture",
+        "file": {
+          "url": "//images.contentful.com/cfexampleapi/1x0xpXu4pSGS4OukSyWGUK/cc1239c6385428ef26f4180190532818/doge.jpg",
+          "details": {
+            "size": 522943,
+            "image": {
+              "width": 5800,
+              "height": 4350
+            }
+          },
+          "fileName": "doge.jpg",
+          "contentType": "image/jpeg"
+        }
+      }
+    },
+    {
+      "sys": {
+        "space": {
+          "sys": {
+            "type": "Link",
+            "linkType": "Space",
+            "id": "{{.SpaceID}}"
+          }
+        },
+        "id": "happycat",
+        "type": "Asset",
+        "createdAt": "2013-09-02T14:56:34.267Z",
+        "updatedAt": "2013-09-02T15:11:24.361Z",
+        "revision": 2,
+        "locale": "en-US"
+      },
+      "fields": {
+        "title": "Happy Cat",
+        "file": {
+          "url": "//images.contentful.com/cfexampleapi/3MZPnjZTIskAIIkuuosCss/382a48dfa2cb16c47aa2c72f7b23bf09/happycatw.jpg",
+          "details": {
+            "size": 59939,
+            "image": {
+              "width": 273,
+              "height": 397
+            }
+          },
+          "fileName": "happycatw.jpg",
+          "contentType": "image/jpeg"
+        }
+      }
+    },
+    {
+      "sys": {
+        "space": {
+          "sys": {
+            "type": "Link",
+            "linkType": "Space",
+            "id": "{{.SpaceID}}"
+          }
+        },
+        "id": "nyancat",
+        "type": "Asset",
+        "createdAt": "2013-09-02T14:56:34.240Z",
+        "updatedAt": "2013-09-02T14:56:34.240Z",
+        "revision": 1,
+        "locale": "en-US"
+      },
+      "fields": {
+        "title": "Nyan Cat",
+        "file": {
+          "url": "//images.contentful.com/cfexampleapi/4gp6taAwW4CmSgumq2ekUm/9da0cd1936871b8d72343e895a00d611/Nyan_cat_250px_frame.png",
+          "details": {
+            "size": 12273,
+            "image": {
+              "width": 250,
+              "height": 250
+            }
+          },
+          "fileName": "Nyan_cat_250px_frame.png",
+          "contentType": "image/png"
+        }
+      }
+    }
+  ]
+}
