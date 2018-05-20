@@ -40,7 +40,7 @@ type FileFields struct {
 
 // Asset model
 type Asset struct {
-	locale string
+	Locale string
 	Sys    *Sys        `json:"sys"`
 	Fields *FileFields `json:"fields"`
 }
@@ -61,15 +61,15 @@ func (asset *Asset) MarshalJSON() ([]byte, error) {
 
 	// title
 	title := fields["title"].(map[string]string)
-	title[asset.locale] = asset.Fields.Title
+	title[asset.Locale] = asset.Fields.Title
 
 	// description
 	description := fields["description"].(map[string]string)
-	description[asset.locale] = asset.Fields.Description
+	description[asset.Locale] = asset.Fields.Description
 
 	// file
 	file := fields["file"].(map[string]interface{})
-	file[asset.locale] = asset.Fields.File
+	file[asset.Locale] = asset.Fields.File
 
 	return json.Marshal(payload)
 }
@@ -96,12 +96,12 @@ func (asset *Asset) UnmarshalJSON(data []byte) error {
 
 		title := payload["fields"].(map[string]interface{})["title"]
 		if title != nil {
-			title = title.(map[string]interface{})[asset.locale]
+			title = title.(map[string]interface{})[asset.Locale]
 		}
 
 		description := payload["fields"].(map[string]interface{})["description"]
 		if description != nil {
-			description = description.(map[string]interface{})[asset.locale]
+			description = description.(map[string]interface{})[asset.Locale]
 		}
 
 		asset.Fields = &FileFields{
@@ -110,7 +110,7 @@ func (asset *Asset) UnmarshalJSON(data []byte) error {
 			File:        &File{},
 		}
 
-		file := payload["fields"].(map[string]interface{})["file"].(map[string]interface{})[asset.locale]
+		file := payload["fields"].(map[string]interface{})["file"].(map[string]interface{})[asset.Locale]
 		if err := json.Unmarshal([]byte(file.(string)), asset.Fields.File); err != nil {
 			return err
 		}
@@ -178,7 +178,7 @@ func (service *AssetsService) Upsert(spaceID string, asset *Asset) error {
 	var path string
 	var method string
 
-	if asset.Sys.CreatedAt != "" {
+	if asset.Sys.ID != "" {
 		path = fmt.Sprintf("/spaces/%s/assets/%s", spaceID, asset.Sys.ID)
 		method = "PUT"
 	} else {
@@ -214,7 +214,7 @@ func (service *AssetsService) Delete(spaceID string, asset *Asset) error {
 
 // Process the asset
 func (service *AssetsService) Process(spaceID string, asset *Asset) error {
-	path := fmt.Sprintf("/spaces/%s/assets/%s/files/%s/process", spaceID, asset.Sys.ID, asset.locale)
+	path := fmt.Sprintf("/spaces/%s/assets/%s/files/%s/process", spaceID, asset.Sys.ID, asset.Locale)
 	method := "PUT"
 
 	req, err := service.c.newRequest(method, path, nil, nil)
