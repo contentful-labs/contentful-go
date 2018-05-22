@@ -33,94 +33,15 @@ type FileImage struct {
 
 // FileFields model
 type FileFields struct {
-	Title       string `json:"title,omitempty"`
-	Description string `json:"description,omitempty"`
-	File        *File  `json:"file,omitempty"`
+	Title       map[string]string `json:"title,omitempty"`
+	Description map[string]string `json:"description,omitempty"`
+	File        map[string]*File  `json:"file,omitempty"`
 }
 
 // Asset model
 type Asset struct {
-	Locale string
 	Sys    *Sys        `json:"sys"`
 	Fields *FileFields `json:"fields"`
-}
-
-// MarshalJSON for custom json marshaling
-func (asset *Asset) MarshalJSON() ([]byte, error) {
-	payload := map[string]interface{}{
-		"sys": "",
-		"fields": map[string]interface{}{
-			"title":       map[string]string{},
-			"description": map[string]string{},
-			"file":        map[string]interface{}{},
-		},
-	}
-
-	payload["sys"] = asset.Sys
-	fields := payload["fields"].(map[string]interface{})
-
-	// title
-	title := fields["title"].(map[string]string)
-	title[asset.Locale] = asset.Fields.Title
-
-	// description
-	description := fields["description"].(map[string]string)
-	description[asset.Locale] = asset.Fields.Description
-
-	// file
-	file := fields["file"].(map[string]interface{})
-	file[asset.Locale] = asset.Fields.File
-
-	return json.Marshal(payload)
-}
-
-// UnmarshalJSON for custom json unmarshaling
-func (asset *Asset) UnmarshalJSON(data []byte) error {
-	var payload map[string]interface{}
-	if err := json.Unmarshal(data, &payload); err != nil {
-		return err
-	}
-
-	fileName := payload["fields"].(map[string]interface{})["file"].(map[string]interface{})["fileName"]
-	localized := false
-
-	if fileName == nil {
-		localized = true
-	}
-
-	if localized == false {
-		asset.Sys = &Sys{}
-		if err := json.Unmarshal([]byte(payload["sys"].(string)), asset.Sys); err != nil {
-			return err
-		}
-
-		title := payload["fields"].(map[string]interface{})["title"]
-		if title != nil {
-			title = title.(map[string]interface{})[asset.Locale]
-		}
-
-		description := payload["fields"].(map[string]interface{})["description"]
-		if description != nil {
-			description = description.(map[string]interface{})[asset.Locale]
-		}
-
-		asset.Fields = &FileFields{
-			Title:       title.(string),
-			Description: description.(string),
-			File:        &File{},
-		}
-
-		file := payload["fields"].(map[string]interface{})["file"].(map[string]interface{})[asset.Locale]
-		if err := json.Unmarshal([]byte(file.(string)), asset.Fields.File); err != nil {
-			return err
-		}
-	} else {
-		if err := json.Unmarshal(data, asset); err != nil {
-			return err
-		}
-	}
-
-	return nil
 }
 
 // GetVersion returns entity version
@@ -214,7 +135,13 @@ func (service *AssetsService) Delete(spaceID string, asset *Asset) error {
 
 // Process the asset
 func (service *AssetsService) Process(spaceID string, asset *Asset) error {
-	path := fmt.Sprintf("/spaces/%s/assets/%s/files/%s/process", spaceID, asset.Sys.ID, asset.Locale)
+	var locale string
+	for k, _ := range asset.Fields.Title {
+		locale = k
+		break
+	}
+
+	path := fmt.Sprintf("/spaces/%s/assets/%s/files/%s/process", spaceID, asset.Sys.ID, locale)
 	method := "PUT"
 
 	req, err := service.c.newRequest(method, path, nil, nil)
