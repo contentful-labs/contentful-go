@@ -23,8 +23,8 @@ func ExampleEntryService_Upsert_create() {
 				},
 			},
 		},
-		Fields: map[string]LocalizedField{
-			"Description": LocalizedField{
+		Fields: map[string]interface{}{
+			"Description": map[string]string{
 				"en-US": "Some example content...",
 			},
 		},
@@ -93,8 +93,8 @@ func TestEntrySaveForCreate(t *testing.T) {
 				},
 			},
 		},
-		Fields: map[string]LocalizedField{
-			"Description": LocalizedField{
+		Fields: map[string]interface{}{
+			"Description": map[string]string{
 				"en-US": "Some test content...",
 			},
 		},

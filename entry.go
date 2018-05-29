@@ -11,13 +11,11 @@ import (
 // EntriesService servıce
 type EntriesService service
 
-type LocalizedField map[string]interface{}
-
 //Entry model
 type Entry struct {
 	locale string
-	Sys    *Sys                      `json:"sys"`
-	Fields map[string]LocalizedField `json:"fields,omitempty"`
+	Sys    *Sys                   `json:"sys"`
+	Fields map[string]interface{} `json:"fields,omitempty"`
 }
 
 // GetVersion returns entity version
