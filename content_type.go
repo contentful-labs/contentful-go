@@ -20,6 +20,9 @@ type ContentType struct {
 }
 
 const (
+    // FieldTypeSymbol content type field type for short textual data
+    FieldTypeSymbol = "Symbol"
+
 	// FieldTypeText content type field type for text data
 	FieldTypeText = "Text"
 
