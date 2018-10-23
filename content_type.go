@@ -23,6 +23,9 @@ const (
 	// FieldTypeText content type field type for text data
 	FieldTypeText = "Text"
 
+	// FieldTypeSymbol content type field type for text data
+	FieldTypeSymbol = "Symbol"
+
 	// FieldTypeArray content type field type for array data
 	FieldTypeArray = "Array"
 
