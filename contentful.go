@@ -120,6 +120,11 @@ func (c *Contentful) SetOrganization(organizationID string) *Contentful {
 	return c
 }
 
+// SetHTTPClient sets the underlying http.Client used to make requests.
+func (c *Contentful) SetHTTPClient(client *http.Client) {
+	c.client = client
+}
+
 func (c *Contentful) newRequest(method, path string, query url.Values, body io.Reader) (*http.Request, error) {
 	u, err := url.Parse(c.BaseURL)
 	if err != nil {
