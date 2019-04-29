@@ -179,6 +179,15 @@ func TestContentfulSetOrganization(t *testing.T) {
 	assert.Equal(organizationID, cma.Headers["X-Contentful-Organization"])
 }
 
+func TestContentfulSetClient(t *testing.T) {
+	assert := assert.New(t)
+
+	newClient := &http.Client{}
+	cma := NewCMA(CMAToken)
+	cma.SetHTTPClient(newClient)
+	assert.Equal(newClient, cma.client)
+}
+
 func TestNewRequest(t *testing.T) {
 	setup()
 	defer teardown()
