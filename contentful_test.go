@@ -26,6 +26,7 @@ var (
 	CPAToken       = "cpa-token"
 	spaceID        = "id1"
 	organizationID = "org-id"
+	entryID        = "happycat"
 )
 
 func readTestData(fileName string) string {
@@ -128,6 +129,7 @@ func setup() {
 
 	c = NewCMA(CMAToken)
 	c.BaseURL = server.URL
+	c.Environment = "master"
 }
 
 func teardown() {

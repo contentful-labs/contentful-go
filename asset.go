@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"strconv"
 )
 
@@ -156,9 +157,7 @@ func (service *AssetsService) List(spaceID string) *Collection {
 // Get returns a single asset entity
 func (service *AssetsService) Get(spaceID, assetID string) (*Asset, error) {
 	path := fmt.Sprintf("/spaces/%s/assets/%s", spaceID, assetID)
-	method := "GET"
-
-	req, err := service.c.newRequest(method, path, nil, nil)
+	req, err := service.c.newRequest(http.MethodGet, path, nil, nil)
 	if err != nil {
 		return nil, err
 	}
