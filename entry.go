@@ -2,11 +2,12 @@ package contentful
 
 import (
 	"fmt"
+	"net/http"
 	"net/url"
 	"strconv"
 )
 
-// EntriesService servıce
+// EntriesService service
 type EntriesService service
 
 //Entry model
@@ -56,10 +57,13 @@ func (service *EntriesService) GetEntryKey(entry *Entry, key string) (*EntryFiel
 
 // List returns entries collection
 func (service *EntriesService) List(spaceID string) *Collection {
-	path := fmt.Sprintf("/spaces/%s/entries", spaceID)
-	method := "GET"
+	if service.c.Environment == "" {
+		return &Collection{}
+	}
 
-	req, err := service.c.newRequest(method, path, nil, nil)
+	path := fmt.Sprintf("/spaces/%s/environments/%s/entries", spaceID, service.c.Environment)
+
+	req, err := service.c.newRequest(http.MethodGet, path, nil, nil)
 	if err != nil {
 		return &Collection{}
 	}
@@ -67,7 +71,7 @@ func (service *EntriesService) List(spaceID string) *Collection {
 	col := NewCollection(&CollectionOptions{})
 	col.c = service.c
 	col.req = req
-
+	
 	return col
 }
 

@@ -19,8 +19,8 @@ import (
 
 var (
 	server         *httptest.Server
-	cma            *Contentful
-	c              *Contentful
+	cma            *Client
+	c              *Client
 	CMAToken       = "b4c0n73n7fu1"
 	CDAToken       = "cda-token"
 	CPAToken       = "cpa-token"
@@ -139,7 +139,7 @@ func TestContentfulNewCMA(t *testing.T) {
 	assert := assert.New(t)
 
 	cma := NewCMA(CMAToken)
-	assert.IsType(Contentful{}, *cma)
+	assert.IsType(Client{}, *cma)
 	assert.Equal("https://api.contentful.com", cma.BaseURL)
 	assert.Equal("CMA", cma.api)
 	assert.Equal(CMAToken, cma.token)
@@ -152,7 +152,7 @@ func TestContentfulNewCDA(t *testing.T) {
 	assert := assert.New(t)
 
 	cda := NewCDA(CDAToken)
-	assert.IsType(Contentful{}, *cda)
+	assert.IsType(Client{}, *cda)
 	assert.Equal("https://cdn.contentful.com", cda.BaseURL)
 	assert.Equal("CDA", cda.api)
 	assert.Equal(CDAToken, cda.token)
@@ -165,7 +165,7 @@ func TestContentfulNewCPA(t *testing.T) {
 	assert := assert.New(t)
 
 	cpa := NewCPA(CPAToken)
-	assert.IsType(Contentful{}, *cpa)
+	assert.IsType(Client{}, *cpa)
 	assert.Equal("https://preview.contentful.com", cpa.BaseURL)
 	assert.Equal("CPA", cpa.api)
 	assert.Equal(CPAToken, cpa.token)
