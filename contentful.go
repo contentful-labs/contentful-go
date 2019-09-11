@@ -172,16 +172,15 @@ func (c *Client) do(req *http.Request, v interface{}) error {
 	if err != nil {
 		return err
 	}
+	defer res.Body.Close()
 
 	if res.StatusCode >= 200 && res.StatusCode < 400 {
 		if v != nil {
-			defer res.Body.Close()
 			err = json.NewDecoder(res.Body).Decode(v)
 			if err != nil {
 				return err
 			}
 		}
-
 		return nil
 	}
 
@@ -207,7 +206,6 @@ func (c *Client) do(req *http.Request, v interface{}) error {
 	}
 
 	time.Sleep(time.Second * time.Duration(waitSeconds))
-
 	return c.do(req, v)
 }
 

@@ -1,7 +1,7 @@
 package contentful
 
 import (
-	"fmt"
+	"errors"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -56,50 +56,63 @@ func (service *EntriesService) GetEntryKey(entry *Entry, key string) (*EntryFiel
 }
 
 // List returns entries collection
-func (service *EntriesService) List(spaceID string) *Collection {
-	if service.c.Environment == "" {
-		return &Collection{}
-	}
-
-	path := fmt.Sprintf("/spaces/%s/environments/%s/entries", spaceID, service.c.Environment)
-
-	req, err := service.c.newRequest(http.MethodGet, path, nil, nil)
-	if err != nil {
-		return &Collection{}
-	}
-
+func (service *EntriesService) List(spaceID string) (*Collection, error) {
 	col := NewCollection(&CollectionOptions{})
 	col.c = service.c
+
+	if service.c.Environment == "" {
+		return col, errors.New("the environment must be set before calling this method")
+	}
+
+	path := "/spaces/" + spaceID +  "/environments/" + service.c.Environment + "/entries"
+	req, err := service.c.newRequest(http.MethodGet, path, nil, nil)
+	if err != nil {
+		return col, err
+	}
 	col.req = req
-	
-	return col
+
+	if ok := service.c.do(req, &col); ok != nil {
+		return nil, err
+	}
+	return col, nil
 }
 
 // Get returns a single entry
-func (service *EntriesService) Get(spaceID, entryID string) (*Entry, error) {
-	path := fmt.Sprintf("/spaces/%s/entries/%s", spaceID, entryID)
+func (service *EntriesService) Get(spaceID, entryID string) (Entry, error) {
+	entry := Entry{
+		Sys:    &Sys{},
+	}
+	path := "/spaces/" + spaceID +  "/environments/" + service.c.Environment + "/entries/" + entryID
 	query := url.Values{}
-	method := "GET"
 
-	req, err := service.c.newRequest(method, path, query, nil)
+	req, err := service.c.newRequest(http.MethodGet, path, query, nil)
 	if err != nil {
-		return &Entry{}, err
+		return entry, err
 	}
 
-	var entry Entry
 	if ok := service.c.do(req, &entry); ok != nil {
-		return nil, err
+		return entry, err
 	}
-
-	return &entry, err
+	return entry, err
 }
 
 // Delete the entry
 func (service *EntriesService) Delete(spaceID string, entryID string) error {
-	path := fmt.Sprintf("/spaces/%s/entries/%s", spaceID, entryID)
-	method := "DELETE"
+	path := "/spaces/" + spaceID +  "/environments/" + service.c.Environment + "/entries/" + entryID
 
-	req, err := service.c.newRequest(method, path, nil, nil)
+	req, err := service.c.newRequest(http.MethodDelete, path, nil, nil)
+	if err != nil {
+		return err
+	}
+
+	return service.c.do(req, nil)
+}
+
+// Create a single entry, this method does not publish the entry.
+func (service *EntriesService) Create(spaceID string, entry *Entry) error {
+	path := "/spaces/" + spaceID +  "/environments/" + service.c.Environment + "/entries/"
+
+	req, err := service.c.newRequest(http.MethodPut, path, nil, nil)
 	if err != nil {
 		return err
 	}
@@ -109,10 +122,9 @@ func (service *EntriesService) Delete(spaceID string, entryID string) error {
 
 // Publish the entry
 func (service *EntriesService) Publish(spaceID string, entry *Entry) error {
-	path := fmt.Sprintf("/spaces/%s/entries/%s/published", spaceID, entry.Sys.ID)
-	method := "PUT"
+	path := "/spaces/" + spaceID +  "/environments/" + service.c.Environment + "/entries/" + entry.Sys.ID + "published"
 
-	req, err := service.c.newRequest(method, path, nil, nil)
+	req, err := service.c.newRequest(http.MethodPut, path, nil, nil)
 	if err != nil {
 		return err
 	}
@@ -123,12 +135,11 @@ func (service *EntriesService) Publish(spaceID string, entry *Entry) error {
 	return service.c.do(req, nil)
 }
 
-// Unpublish the entry
-func (service *EntriesService) Unpublish(spaceID string, entry *Entry) error {
-	path := fmt.Sprintf("/spaces/%s/entries/%s/published", spaceID, entry.Sys.ID)
-	method := "DELETE"
+// UnPublish the entry
+func (service *EntriesService) UnPublish(spaceID string, entry *Entry) error {
+	path := "/spaces/" + spaceID +  "/environments/" + service.c.Environment + "/entries/" + entry.Sys.ID + "published"
 
-	req, err := service.c.newRequest(method, path, nil, nil)
+	req, err := service.c.newRequest(http.MethodDelete, path, nil, nil)
 	if err != nil {
 		return err
 	}
