@@ -57,10 +57,6 @@ func (service *EntriesService) GetEntryKey(entry *Entry, key string) (*EntryFiel
 
 // List returns entries collection
 func (service *EntriesService) List(spaceID string) *Collection {
-	if service.c.Environment == "" {
-		return &Collection{}
-	}
-
 	path := fmt.Sprintf("/spaces/%s/environments/%s/entries", spaceID, service.c.Environment)
 
 	req, err := service.c.newRequest(http.MethodGet, path, nil, nil)

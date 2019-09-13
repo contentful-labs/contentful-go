@@ -51,7 +51,8 @@ func NewCMA(token string) *Client {
 			"Content-Type":            "application/vnd.contentful.management.v1+json",
 			"X-Contentful-User-Agent": fmt.Sprintf("sdk contentful.go/%s", Version),
 		},
-		BaseURL: "https://api.contentful.com",
+		BaseURL:     "https://api.contentful.com",
+		Environment: "master",
 	}
 	c.commonService.c = c
 
@@ -77,7 +78,8 @@ func NewCDA(token string) *Client {
 			"Content-Type":            "application/vnd.contentful.delivery.v1+json",
 			"X-Contentful-User-Agent": fmt.Sprintf("contentful-go/%s", Version),
 		},
-		BaseURL: "https://cdn.contentful.com",
+		BaseURL:     "https://cdn.contentful.com",
+		Environment: "master",
 	}
 	c.commonService.c = c
 
