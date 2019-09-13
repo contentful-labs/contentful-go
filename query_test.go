@@ -17,7 +17,7 @@ func TestQueryInclude(t *testing.T) {
 
 	assert.Panics(t, func() {
 		q := NewQuery().Include(11)
-		q.String()
+		_ = q.String()
 	}, "out of range `include` should panic")
 }
 
@@ -52,12 +52,12 @@ func TestQuerySelect(t *testing.T) {
 		}
 
 		q := NewQuery().Select(fields)
-		q.String()
+		_ = q.String()
 	}, "select accepts 100 fields max")
 
 	assert.Panics(t, func() {
 		q := NewQuery().Select([]string{"field1", "field2.d1", "field3.d2.d3"})
-		q.String()
+		_ = q.String()
 	}, "select accepts depths 3 max")
 }
 
@@ -252,7 +252,7 @@ func TestQueryLimit(t *testing.T) {
 
 	assert.Panics(t, func() {
 		q := NewQuery().Limit(3000)
-		q.String()
+		_ = q.String()
 	}, "out of range limit should panic")
 }
 

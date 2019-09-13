@@ -1,7 +1,7 @@
 [![codecov](https://codecov.io/gh/contentful-labs/contentful-go/branch/master/graph/badge.svg)](https://codecov.io/gh/contentful-labs/contentful-go)
 [![Godoc](https://img.shields.io/badge/godoc-Reference-brightgreen.svg?style=flat)](https://godoc.org/github.com/contentful-labs/contentful-go)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Build Status](https://travis-ci.com/contentful-labs/contentful-go.svg?token=ppF3HxXy28XU9AwHHiGX&branch=master)](https://travis-ci.com/contentful-labs/contentful-go)
+[![Build Status](https://travis-ci.org/contentful-labs/contentful-go.svg?branch=master)](https://travis-ci.org/contentful-labs/contentful-go)
 
 
 # contentful-go
@@ -45,7 +45,7 @@ cma.SetOrganization("your-organization-id")
 
 #### Debug mode
 
-When debug mode is activated, sdk client starts to work in verbose mode and try to print as much informatin as possible. In debug mode, all outgoing http requests are printed nicely in the form of `curl` command so that you can easly drop into your command line to debug specific request.
+When debug mode is activated, sdk client starts to work in verbose mode and try to print as much information as possible. In debug mode, all outgoing http requests are printed nicely in the form of `curl` command so that you can easly drop into your command line to debug specific request.
 
 ```go
 cma.Debug = true
