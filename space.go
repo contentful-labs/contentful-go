@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"strconv"
 )
 
@@ -52,9 +53,7 @@ func (service *SpacesService) List() *Collection {
 // Get returns a single space entity
 func (service *SpacesService) Get(spaceID string) (*Space, error) {
 	path := fmt.Sprintf("/spaces/%s", spaceID)
-	method := "GET"
-
-	req, err := service.c.newRequest(method, path, nil, nil)
+	req, err := service.c.newRequest(http.MethodGet, path, nil, nil)
 	if err != nil {
 		return &Space{}, err
 	}
@@ -79,10 +78,10 @@ func (service *SpacesService) Upsert(space *Space) error {
 
 	if space.Sys != nil && space.Sys.CreatedAt != "" {
 		path = fmt.Sprintf("/spaces/%s", space.Sys.ID)
-		method = "PUT"
+		method = http.MethodPut
 	} else {
 		path = "/spaces"
-		method = "POST"
+		method = http.MethodPost
 	}
 
 	req, err := service.c.newRequest(method, path, nil, bytes.NewReader(bytesArray))
@@ -98,9 +97,8 @@ func (service *SpacesService) Upsert(space *Space) error {
 // Delete the given space
 func (service *SpacesService) Delete(space *Space) error {
 	path := fmt.Sprintf("/spaces/%s", space.Sys.ID)
-	method := "DELETE"
 
-	req, err := service.c.newRequest(method, path, nil, nil)
+	req, err := service.c.newRequest(http.MethodDelete, path, nil, nil)
 	if err != nil {
 		return err
 	}
