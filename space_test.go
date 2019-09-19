@@ -125,6 +125,46 @@ func TestSpacesServiceList(t *testing.T) {
 	assert.Equal("id2", spaces[1].Sys.ID)
 }
 
+func TestSpacesServiceList_Pagination(t *testing.T) {
+	var err error
+	assert := assert.New(t)
+
+	requestCount := 1
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(r.Method, "GET")
+		assert.Equal(r.URL.Path, "/spaces")
+		checkHeaders(r, assert)
+
+		w.WriteHeader(200)
+		query := r.URL.Query()
+		if requestCount == 1 {
+			assert.Equal(query.Get("order"), "-sys.createdAt")
+			assert.Equal(query.Get("skip"), "")
+			fmt.Fprintln(w, readTestData("spaces.json"))
+		} else {
+			assert.Equal(query.Get("order"), "-sys.createdAt")
+			assert.Equal(query.Get("skip"), "100")
+			fmt.Fprintln(w, readTestData("spaces-page-2.json"))
+		}
+		requestCount++
+	})
+
+	// test server
+	server := httptest.NewServer(handler)
+	defer server.Close()
+
+	// cma client
+	cma = NewCMA(CMAToken)
+	cma.BaseURL = server.URL
+
+	collection, err := cma.Spaces.List().Next()
+	assert.Nil(err)
+
+	nextPage, err := collection.Next()
+	assert.Nil(err)
+	assert.IsType(&Collection{}, nextPage)
+}
+
 func TestSpacesServiceGet(t *testing.T) {
 	var err error
 	assert := assert.New(t)

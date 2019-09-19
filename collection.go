@@ -43,7 +43,7 @@ func NewCollection(options *CollectionOptions) *Collection {
 // Next makes the col.req
 func (col *Collection) Next() (*Collection, error) {
 	// setup query params
-	skip := col.Query.limit * (col.page - 1)
+	skip := uint16(col.Limit) * (col.page - 1)
 	col.Query.Skip(skip)
 
 	// override request query
