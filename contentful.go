@@ -26,13 +26,14 @@ type Client struct {
 	Environment   string
 	commonService service
 
-	Spaces       *SpacesService
-	APIKeys      *APIKeyService
-	Assets       *AssetsService
-	ContentTypes *ContentTypesService
-	Entries      *EntriesService
-	Locales      *LocalesService
-	Webhooks     *WebhooksService
+	Spaces         *SpacesService
+	APIKeys        *APIKeyService
+	PreviewAPIKeys *PreviewAPIKeyService
+	Assets         *AssetsService
+	ContentTypes   *ContentTypesService
+	Entries        *EntriesService
+	Locales        *LocalesService
+	Webhooks       *WebhooksService
 }
 
 type service struct {
@@ -58,6 +59,7 @@ func NewCMA(token string) *Client {
 
 	c.Spaces = (*SpacesService)(&c.commonService)
 	c.APIKeys = (*APIKeyService)(&c.commonService)
+	c.PreviewAPIKeys = (*PreviewAPIKeyService)(&c.commonService)
 	c.Assets = (*AssetsService)(&c.commonService)
 	c.ContentTypes = (*ContentTypesService)(&c.commonService)
 	c.Entries = (*EntriesService)(&c.commonService)

@@ -17,18 +17,15 @@ type APIKey struct {
 	Description   string          `json:"description,omitempty"`
 	AccessToken   string          `json:"accessToken,omitempty"`
 	Policies      []*APIKeyPolicy `json:"policies,omitempty"`
-	PreviewAPIKey *PreviewAPIKey  `json:"preview_api_key,omitempty"`
+	PreviewAPIKey struct {
+		Sys *Sys
+	} `json:"preview_api_key,omitempty"`
 }
 
 // APIKeyPolicy model
 type APIKeyPolicy struct {
 	Effect  string `json:"effect,omitempty"`
 	Actions string `json:"actions,omitempty"`
-}
-
-// PreviewAPIKey model
-type PreviewAPIKey struct {
-	Sys *Sys
 }
 
 // MarshalJSON for custom json marshaling
