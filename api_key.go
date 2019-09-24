@@ -115,6 +115,29 @@ func (service *APIKeyService) Upsert(spaceID string, apiKey *APIKey) error {
 	return service.c.do(req, apiKey)
 }
 
+func (service *APIKeyService) Create(spaceID string, apiKey *APIKey) error {
+	bytesArray, err := json.Marshal(apiKey)
+	if err != nil {
+		return err
+	}
+
+	var path, method string
+	if apiKey.Sys != nil && apiKey.Sys.ID != "" {
+		path = fmt.Sprintf("/spaces/%s/api_keys/%s", spaceID, apiKey.Sys.ID)
+		method = "PUT"
+	} else {
+		path = fmt.Sprintf("/spaces/%s/api_keys", spaceID)
+		method = "POST"
+	}
+
+	req, err := service.c.newRequest(method, path, nil, bytes.NewReader(bytesArray))
+	if err != nil {
+		return err
+	}
+
+	return service.c.do(req, apiKey)
+}
+
 // Delete deletes a sinlge api key entity
 func (service *APIKeyService) Delete(spaceID string, apiKey *APIKey) error {
 	path := fmt.Sprintf("/spaces/%s/api_keys/%s", spaceID, apiKey.Sys.ID)
