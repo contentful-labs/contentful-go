@@ -13,8 +13,8 @@ type EntriesService service
 //Entry model
 type Entry struct {
 	locale string
-	Sys    *Sys `json:"sys"`
-	Fields map[string]interface{}
+	Sys    *Sys                   `json:"sys"`
+	Fields map[string]interface{} `json:"fields"`
 }
 
 // GetVersion returns entity version
