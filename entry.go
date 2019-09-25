@@ -1,6 +1,8 @@
 package contentful
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -67,13 +69,42 @@ func (service *EntriesService) List(spaceID string) *Collection {
 	col := NewCollection(&CollectionOptions{})
 	col.c = service.c
 	col.req = req
-	
+
 	return col
+}
+
+// Upsert updates or creates a new entry
+func (service *EntriesService) Upsert(spaceID string, entry *Entry) error {
+	bytesArray, err := json.Marshal(entry)
+	if err != nil {
+		return err
+	}
+
+	var path, method string
+	baseUrl := fmt.Sprintf("/spaces/%s/environments/%s", spaceID, service.c.Environment)
+	if entry.Sys != nil && entry.Sys.ID != "" {
+		path = fmt.Sprintf("%s/entries/%s", baseUrl, entry.Sys.ID)
+		method = "PUT"
+	} else {
+		path = fmt.Sprintf("%s/entries", baseUrl)
+		method = "POST"
+	}
+
+	req, err := service.c.newRequest(method, path, nil, bytes.NewReader(bytesArray))
+
+	if err != nil {
+		return err
+	}
+
+	contentTypeId := entry.Sys.ContentType.Sys.ID
+	req.Header.Set("X-Contentful-Content-Type", contentTypeId)
+
+	return service.c.do(req, entry)
 }
 
 // Get returns a single entry
 func (service *EntriesService) Get(spaceID, entryID string) (*Entry, error) {
-	path := fmt.Sprintf("/spaces/%s/entries/%s", spaceID, entryID)
+	path := fmt.Sprintf("/spaces/%s/environments/%s/entries/%s", spaceID, entryID, service.c.Environment)
 	query := url.Values{}
 	method := "GET"
 
@@ -83,7 +114,7 @@ func (service *EntriesService) Get(spaceID, entryID string) (*Entry, error) {
 	}
 
 	var entry Entry
-	if ok := service.c.do(req, &entry); ok != nil {
+	if err := service.c.do(req, &entry); err != nil {
 		return nil, err
 	}
 
@@ -105,7 +136,8 @@ func (service *EntriesService) Delete(spaceID string, entryID string) error {
 
 // Publish the entry
 func (service *EntriesService) Publish(spaceID string, entry *Entry) error {
-	path := fmt.Sprintf("/spaces/%s/entries/%s/published", spaceID, entry.Sys.ID)
+	envPath := fmt.Sprintf("/spaces/%s/environments/%s", spaceID, service.c.Environment)
+	path := fmt.Sprintf("%s/entries/%s/published", envPath, entry.Sys.ID)
 	method := "PUT"
 
 	req, err := service.c.newRequest(method, path, nil, nil)
