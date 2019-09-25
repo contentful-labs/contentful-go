@@ -58,19 +58,20 @@ func (asset *Asset) MarshalJSON() ([]byte, error) {
 
 	payload["sys"] = asset.Sys
 	fields := payload["fields"].(map[string]interface{})
+	// TODO remove hardcoding of locale
+	locale := "en-US"
 
 	// title
 	title := fields["title"].(map[string]string)
-	title[asset.locale] = asset.Fields.Title
+	title[locale] = asset.Fields.Title
 
 	// description
 	description := fields["description"].(map[string]string)
-	description[asset.locale] = asset.Fields.Description
+	description[locale] = asset.Fields.Description
 
 	// file
 	file := fields["file"].(map[string]interface{})
-	file[asset.locale] = asset.Fields.File
-
+	file[locale] = asset.Fields.File
 	return json.Marshal(payload)
 }
 
@@ -92,29 +93,46 @@ func (asset *Asset) UnmarshalJSON(data []byte) error {
 
 	if localized == false {
 		asset.Sys = &Sys{}
-		b, _ := json.Marshal(payload["sys"])
+		b, err := json.Marshal(payload["sys"])
+		if err != nil {
+			return err
+		}
 		if err := json.Unmarshal(b, asset.Sys); err != nil {
 			return err
 		}
 
 		title := payload["fields"].(map[string]interface{})["title"]
-		if title != nil {
-			title = title.(map[string]interface{})[asset.locale]
+		locale := ""
+		for localeCode, _ := range title.(map[string]interface{}) {
+			if locale != "" {
+				break
+			}
+			locale = localeCode
 		}
 
-		description := payload["fields"].(map[string]interface{})["description"]
-		if description != nil {
-			description = description.(map[string]interface{})[asset.locale]
+		if title != nil {
+			titles := title.(map[string]interface{})
+			title = titles[locale]
+		}
+
+		description := ""
+		descriptionMap := payload["fields"].(map[string]interface{})["description"]
+		if descriptionMap != nil {
+			description = descriptionMap.(map[string]interface{})[locale].(string)
 		}
 
 		asset.Fields = &FileFields{
 			Title:       title.(string),
-			Description: description.(string),
+			Description: description,
 			File:        &File{},
 		}
 
-		file := payload["fields"].(map[string]interface{})["file"].(map[string]interface{})[asset.locale]
-		if err := json.Unmarshal([]byte(file.(string)), asset.Fields.File); err != nil {
+		file := payload["fields"].(map[string]interface{})["file"].(map[string]interface{})[locale]
+		b, _ = json.Marshal(file)
+		if err != nil {
+			return err
+		}
+		if err := json.Unmarshal(b, asset.Fields.File); err != nil {
 			return err
 		}
 	} else {
@@ -171,6 +189,29 @@ func (service *AssetsService) Get(spaceID, assetID string) (*Asset, error) {
 	return &asset, nil
 }
 
+func (service *AssetsService) Create(spaceID string, asset *Asset) error {
+	bytesArray, err := json.Marshal(asset)
+	if err != nil {
+		return err
+	}
+
+	var path, method string
+	if asset.Sys != nil && asset.Sys.ID != "" {
+		path = fmt.Sprintf("/spaces/%s/assets/%s", spaceID, asset.Sys.ID)
+		method = "PUT"
+	} else {
+		path = fmt.Sprintf("/spaces/%s/assets", spaceID)
+		method = "POST"
+	}
+
+	req, err := service.c.newRequest(method, path, nil, bytes.NewReader(bytesArray))
+	if err != nil {
+		return err
+	}
+
+	return service.c.do(req, asset)
+}
+
 // Upsert updates or creates a new asset entity
 func (service *AssetsService) Upsert(spaceID string, asset *Asset) error {
 	bytesArray, err := json.Marshal(asset)
@@ -217,7 +258,8 @@ func (service *AssetsService) Delete(spaceID string, asset *Asset) error {
 
 // Process the asset
 func (service *AssetsService) Process(spaceID string, asset *Asset) error {
-	path := fmt.Sprintf("/spaces/%s/assets/%s/files/%s/process", spaceID, asset.Sys.ID, asset.locale)
+	// TODO remove hardcoding of locale
+	path := fmt.Sprintf("/spaces/%s/assets/%s/files/%s/process", spaceID, asset.Sys.ID, "en-US")
 	method := "PUT"
 
 	req, err := service.c.newRequest(method, path, nil, nil)
@@ -231,7 +273,7 @@ func (service *AssetsService) Process(spaceID string, asset *Asset) error {
 	return service.c.do(req, nil)
 }
 
-// Publish published the asset
+// Publish the asset
 func (service *AssetsService) Publish(spaceID string, asset *Asset) error {
 	path := fmt.Sprintf("/spaces/%s/assets/%s/published", spaceID, asset.Sys.ID)
 	method := "PUT"
