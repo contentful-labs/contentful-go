@@ -17,18 +17,15 @@ type APIKey struct {
 	Description   string          `json:"description,omitempty"`
 	AccessToken   string          `json:"accessToken,omitempty"`
 	Policies      []*APIKeyPolicy `json:"policies,omitempty"`
-	PreviewAPIKey *PreviewAPIKey  `json:"preview_api_key,omitempty"`
+	PreviewAPIKey struct {
+		Sys *Sys
+	} `json:"preview_api_key,omitempty"`
 }
 
 // APIKeyPolicy model
 type APIKeyPolicy struct {
 	Effect  string `json:"effect,omitempty"`
 	Actions string `json:"actions,omitempty"`
-}
-
-// PreviewAPIKey model
-type PreviewAPIKey struct {
-	Sys *Sys
 }
 
 // MarshalJSON for custom json marshaling
@@ -111,6 +108,29 @@ func (service *APIKeyService) Upsert(spaceID string, apiKey *APIKey) error {
 	}
 
 	req.Header.Set("X-Contentful-Version", strconv.Itoa(apiKey.GetVersion()))
+
+	return service.c.do(req, apiKey)
+}
+
+func (service *APIKeyService) Create(spaceID string, apiKey *APIKey) error {
+	bytesArray, err := json.Marshal(apiKey)
+	if err != nil {
+		return err
+	}
+
+	var path, method string
+	if apiKey.Sys != nil && apiKey.Sys.ID != "" {
+		path = fmt.Sprintf("/spaces/%s/api_keys/%s", spaceID, apiKey.Sys.ID)
+		method = "PUT"
+	} else {
+		path = fmt.Sprintf("/spaces/%s/api_keys", spaceID)
+		method = "POST"
+	}
+
+	req, err := service.c.newRequest(method, path, nil, bytes.NewReader(bytesArray))
+	if err != nil {
+		return err
+	}
 
 	return service.c.do(req, apiKey)
 }
