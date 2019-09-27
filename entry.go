@@ -104,7 +104,7 @@ func (service *EntriesService) Upsert(spaceID string, entry *Entry) error {
 
 // Get returns a single entry
 func (service *EntriesService) Get(spaceID, entryID string) (*Entry, error) {
-	path := fmt.Sprintf("/spaces/%s/environments/%s/entries/%s", spaceID, entryID, service.c.Environment)
+	path := fmt.Sprintf("/spaces/%s/environments/%s/entries/%s", spaceID, service.c.Environment, entryID)
 	query := url.Values{}
 	method := "GET"
 
