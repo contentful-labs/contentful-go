@@ -11,7 +11,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/moul/http2curl"
+	"moul.io/http2curl"
 )
 
 // Client model
