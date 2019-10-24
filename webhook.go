@@ -19,6 +19,7 @@ type Webhook struct {
 	HTTPBasicUsername string           `json:"httpBasicUsername,omitempty"`
 	HTTPBasicPassword string           `json:"httpBasicPassword,omitempty"`
 	Headers           []*WebhookHeader `json:"headers,omitempty"`
+	Filters           []string         `json:"filters"`
 }
 
 // WebhookHeader model
