@@ -113,10 +113,10 @@ func (service *EntriesService) Upsert(spaceID string, entry *Entry) error {
 	var method string
 
 	if entry.Sys != nil && entry.Sys.CreatedAt != "" {
-		path = fmt.Sprintf("/spaces/%s/entries/%s", spaceID, entry.Sys.ID)
+		path = fmt.Sprintf("/spaces/%s/environments/%s/entries/%s", spaceID, service.c.Environment, entry.Sys.ID)
 		method = http.MethodPut
 	} else {
-		path = fmt.Sprintf("/spaces/%s/entries", spaceID)
+		path = fmt.Sprintf("/spaces/%s/environments/%s/entries", spaceID, service.c.Environment)
 		method = http.MethodPost
 	}
 

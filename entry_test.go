@@ -60,7 +60,7 @@ func TestEntrySaveForCreate(t *testing.T) {
 
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(r.Method, "POST")
-		assert.Equal(r.RequestURI, "/spaces/"+spaceID+"/entries")
+		assert.Equal(r.RequestURI, "/spaces/"+spaceID+"/environments/master/entries")
 		assert.Equal(r.Header["X-Contentful-Content-Type"], []string{"MyContentType"})
 		checkHeaders(r, assert)
 
