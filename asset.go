@@ -10,138 +10,36 @@ import (
 // AssetsService service
 type AssetsService service
 
-// File model
-type File struct {
-	Name        string      `json:"fileName,omitempty"`
-	ContentType string      `json:"contentType,omitempty"`
-	URL         string      `json:"url,omitempty"`
-	UploadURL   string      `json:"upload,omitempty"`
-	Detail      *FileDetail `json:"details,omitempty"`
-}
-
-// FileDetail model
-type FileDetail struct {
-	Size  int        `json:"size,omitempty"`
-	Image *FileImage `json:"image,omitempty"`
-}
-
-// FileImage model
-type FileImage struct {
-	Width  int `json:"width,omitempty"`
-	Height int `json:"height,omitempty"`
-}
-
-// FileFields model
-type FileFields struct {
-	Title       string `json:"title,omitempty"`
-	Description string `json:"description,omitempty"`
-	File        *File  `json:"file,omitempty"`
-}
-
-// Asset model
+// Asset represents a Contentful asset
 type Asset struct {
 	locale string
-	Sys    *Sys        `json:"sys"`
-	Fields *FileFields `json:"fields"`
+	Sys    *Sys         `json:"sys,omitempty"`
+	Fields *AssetFields `json:"fields,omitempty"`
 }
 
-// MarshalJSON for custom json marshaling
-func (asset *Asset) MarshalJSON() ([]byte, error) {
-	payload := map[string]interface{}{
-		"sys": "",
-		"fields": map[string]interface{}{
-			"title":       map[string]string{},
-			"description": map[string]string{},
-			"file":        map[string]interface{}{},
-		},
-	}
-
-	payload["sys"] = asset.Sys
-	fields := payload["fields"].(map[string]interface{})
-	// TODO remove hardcoding of locale
-	locale := "en-US"
-
-	// title
-	title := fields["title"].(map[string]string)
-	title[locale] = asset.Fields.Title
-
-	// description
-	description := fields["description"].(map[string]string)
-	description[locale] = asset.Fields.Description
-
-	// file
-	file := fields["file"].(map[string]interface{})
-	file[locale] = asset.Fields.File
-	return json.Marshal(payload)
+type AssetFields struct {
+	Title       map[string]string `json:"title,omitempty"`
+	Description map[string]string `json:"description,omitempty"`
+	File        map[string]*File  `json:"file,omitempty"`
 }
 
-// UnmarshalJSON for custom json unmarshaling
-func (asset *Asset) UnmarshalJSON(data []byte) error {
-	type Alias *Asset
+// File represents a Contentful File
+type File struct {
+	URL         string       `json:"url,omitempty"`
+	UploadURL   string       `json:"upload,omitempty"`
+	Details     *FileDetails `json:"details,omitempty"`
+	FileName    string       `json:"fileName,omitempty"`
+	ContentType string       `json:"contentType,omitempty"`
+}
 
-	var payload map[string]interface{}
-	if err := json.Unmarshal(data, &payload); err != nil {
-		return err
-	}
+type FileDetails struct {
+	Size  int          `json:"size,omitempty"`
+	Image *ImageFields `json:"image,omitempty"`
+}
 
-	fileName := payload["fields"].(map[string]interface{})["file"].(map[string]interface{})["fileName"]
-	localized := true
-
-	if fileName == nil {
-		localized = false
-	}
-
-	if localized == false {
-		asset.Sys = &Sys{}
-		b, err := json.Marshal(payload["sys"])
-		if err != nil {
-			return err
-		}
-		if err := json.Unmarshal(b, asset.Sys); err != nil {
-			return err
-		}
-
-		title := payload["fields"].(map[string]interface{})["title"]
-		locale := ""
-		for localeCode, _ := range title.(map[string]interface{}) {
-			if locale != "" {
-				break
-			}
-			locale = localeCode
-		}
-
-		if title != nil {
-			titles := title.(map[string]interface{})
-			title = titles[locale]
-		}
-
-		description := ""
-		descriptionMap := payload["fields"].(map[string]interface{})["description"]
-		if descriptionMap != nil {
-			description = descriptionMap.(map[string]interface{})[locale].(string)
-		}
-
-		asset.Fields = &FileFields{
-			Title:       title.(string),
-			Description: description,
-			File:        &File{},
-		}
-
-		file := payload["fields"].(map[string]interface{})["file"].(map[string]interface{})[locale]
-		b, _ = json.Marshal(file)
-		if err != nil {
-			return err
-		}
-		if err := json.Unmarshal(b, asset.Fields.File); err != nil {
-			return err
-		}
-	} else {
-		if err := json.Unmarshal(data, Alias(asset)); err != nil {
-			return err
-		}
-	}
-
-	return nil
+type ImageFields struct {
+	Width  int `json:"width,omitempty"`
+	Height int `json:"height,omitempty"`
 }
 
 // GetVersion returns entity version
