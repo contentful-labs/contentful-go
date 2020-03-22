@@ -217,15 +217,15 @@ func (q *Query) Locale(locale string) *Query {
 	return q
 }
 
-//Links to entry
-func (q *Query) LinksToEntry(entryId string) *Query {
-	q.linksToEntry = entryId
+//LinksToEntry query
+func (q *Query) LinksToEntry(entryID string) *Query {
+	q.linksToEntry = entryID
 	return q
 }
 
-//Links to asset
-func (q *Query) LinksToAsset(assetId string) *Query {
-	q.linksToAsset = assetId
+//LinksToAsset query
+func (q *Query) LinksToAsset(assetID string) *Query {
+	q.linksToAsset = assetID
 	return q
 }
 
