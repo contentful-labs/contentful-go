@@ -270,6 +270,20 @@ func TestQueryMimeType(t *testing.T) {
 	assert.Equal(t, expected.Encode(), q.String())
 }
 
+func TestQueryLinksToEntry(t *testing.T) {
+	q := NewQuery().LinksToEntry("21tWpTXe2XBHtS1Ytg7n5C")
+	expected := url.Values{}
+	expected.Set("links_to_entry", "21tWpTXe2XBHtS1Ytg7n5C")
+	assert.Equal(t, expected.Encode(), q.String())
+}
+
+func TestQueryLinksToAsset(t *testing.T) {
+	q := NewQuery().LinksToAsset("21tWpTXe2XBHtS1Ytg7n5C")
+	expected := url.Values{}
+	expected.Set("links_to_asset", "21tWpTXe2XBHtS1Ytg7n5C")
+	assert.Equal(t, expected.Encode(), q.String())
+}
+
 func TestQuery(t *testing.T) {
 	q := NewQuery().
 		Equal("cat.name", "catname").
