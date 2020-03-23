@@ -25,7 +25,7 @@ type Collection struct {
 	Includes interface{}   `json:"includes"`
 }
 
-// NewCollection initilazies a new collection
+// NewCollection initializes a new collection
 func NewCollection(options *CollectionOptions) *Collection {
 	query := NewQuery()
 	query.Order("sys.createdAt", true)
@@ -88,6 +88,16 @@ func (col *Collection) ToEntry() []*Entry {
 	json.NewDecoder(bytes.NewReader(byteArray)).Decode(&entries)
 
 	return entries
+}
+
+// ToIncludes cast Includes to Includes model
+func (col *Collection) ToIncludes() *Includes {
+	var includes *Includes
+
+	byteArray, _ := json.Marshal(col.Includes)
+	json.NewDecoder(bytes.NewReader(byteArray)).Decode(&includes)
+
+	return includes
 }
 
 // ToLocale cast Items to Locale model
