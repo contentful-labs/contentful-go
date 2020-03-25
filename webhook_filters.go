@@ -26,24 +26,24 @@ func (f WebhookFilterEquals) MarshalJSON() ([]byte, error) {
 		return json.Marshal(&map[string]map[string][]interface{}{
 			"not": {
 				"equals": {
-					f.Equals,
 					struct {
 						Doc string `json:"doc"`
 					}{
 						f.Doc,
 					},
+					f.Equals,
 				},
 			},
 		})
 	}
 	return json.Marshal(&map[string][]interface{}{
 		"equals": {
-			f.Equals,
 			struct {
 				Doc string `json:"doc"`
 			}{
 				f.Doc,
 			},
+			f.Equals,
 		},
 	})
 }
@@ -83,12 +83,12 @@ func (f WebhookFilterIn) MarshalJSON() ([]byte, error) {
 		return json.Marshal(&map[string]map[string][]interface{}{
 			"not": {
 				"in": {
-					f.In,
 					struct {
 						Doc string `json:"doc"`
 					}{
 						f.Doc,
 					},
+					f.In,
 				},
 			},
 		})
@@ -96,12 +96,12 @@ func (f WebhookFilterIn) MarshalJSON() ([]byte, error) {
 
 	return json.Marshal(&map[string][]interface{}{
 		"in": {
-			f.In,
 			struct {
 				Doc string `json:"doc"`
 			}{
 				f.Doc,
 			},
+			f.In,
 		},
 	})
 }
@@ -146,14 +146,14 @@ func (f WebhookFilterRegexp) MarshalJSON() ([]byte, error) {
 			"not": {
 				"regexp": {
 					struct {
-						Pattern string `json:"pattern"`
-					}{
-						f.Pattern,
-					},
-					struct {
 						Doc string `json:"doc"`
 					}{
 						f.Doc,
+					},
+					struct {
+						Pattern string `json:"pattern"`
+					}{
+						f.Pattern,
 					},
 				},
 			},
@@ -163,14 +163,14 @@ func (f WebhookFilterRegexp) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&map[string][]interface{}{
 		"regexp": {
 			struct {
-				Pattern string `json:"pattern"`
-			}{
-				f.Pattern,
-			},
-			struct {
 				Doc string `json:"doc"`
 			}{
 				f.Doc,
+			},
+			struct {
+				Pattern string `json:"pattern"`
+			}{
+				f.Pattern,
 			},
 		},
 	})
