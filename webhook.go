@@ -19,6 +19,144 @@ type Webhook struct {
 	HTTPBasicUsername string           `json:"httpBasicUsername,omitempty"`
 	HTTPBasicPassword string           `json:"httpBasicPassword,omitempty"`
 	Headers           []*WebhookHeader `json:"headers,omitempty"`
+	Filters           []WebhookFilter  `json:"filters,omitempty"`
+}
+
+// UnmarshalJSON for custom json unmarshaling
+func (webhook *Webhook) UnmarshalJSON(data []byte) error {
+	payload := map[string]interface{}{}
+	if err := json.Unmarshal(data, &payload); err != nil {
+		return err
+	}
+
+	if val, ok := payload["sys"]; ok {
+		byteArray, err := json.Marshal(val)
+		if err != nil {
+			return nil
+		}
+
+		var sys Sys
+		if err := json.Unmarshal(byteArray, &sys); err != nil {
+			return err
+		}
+
+		webhook.Sys = &sys
+	}
+
+	if val, ok := payload["name"]; ok && val != nil {
+		webhook.Name = val.(string)
+	}
+
+	if val, ok := payload["url"]; ok && val != nil {
+		webhook.URL = val.(string)
+	}
+
+	if val, ok := payload["topics"]; ok && val != nil {
+		byteArray, err := json.Marshal(val)
+		if err != nil {
+			return nil
+		}
+
+		var topics []string
+		if err := json.Unmarshal(byteArray, &topics); err != nil {
+			return err
+		}
+
+		webhook.Topics = topics
+	}
+
+	if val, ok := payload["httpBasicUsername"]; ok && val != nil {
+		webhook.HTTPBasicUsername = val.(string)
+	}
+
+	if val, ok := payload["headers"]; ok && val != nil {
+		byteArray, err := json.Marshal(val)
+		if err != nil {
+			return nil
+		}
+
+		var headers []*WebhookHeader
+		if err := json.Unmarshal(byteArray, &headers); err != nil {
+			return err
+		}
+
+		webhook.Headers = headers
+	}
+
+	if val, ok := payload["filters"]; ok && val != nil {
+		filters, err := ParseFilters(val.([]interface{}))
+		if err != nil {
+			return err
+		}
+
+		webhook.Filters = filters
+	}
+
+	return nil
+}
+
+// ParseFilters converts json representation to go struct
+func ParseFilters(data []interface{}) (filters []WebhookFilter, err error) {
+	for _, value := range data {
+		var byteArray []byte
+		var filterOpCondition bool
+		var filter map[string]interface{}
+
+		if filterMap, ok := value.(map[string]interface{}); ok {
+			byteArray, err = json.Marshal(filterMap)
+			if err != nil {
+				return nil, err
+			}
+
+			filterOpCondition = true
+			filter = filterMap
+		}
+
+		if notFilter, ok := filter["not"].(map[string]interface{}); ok {
+			byteArray, err = json.Marshal(notFilter)
+			if err != nil {
+				return nil, err
+			}
+
+			filterOpCondition = false
+			filter = notFilter
+		}
+
+		if _, ok := filter["equals"]; ok {
+			var webhookFilterEquals WebhookFilterEquals
+			err = json.Unmarshal(byteArray, &webhookFilterEquals)
+			if err != nil {
+				return nil, err
+			}
+
+			webhookFilterEquals.Condition = filterOpCondition
+			filters = append(filters, webhookFilterEquals)
+		}
+
+		if _, ok := filter["in"]; ok {
+			var webhookFilterIn WebhookFilterIn
+			err = json.Unmarshal(byteArray, &webhookFilterIn)
+			if err != nil {
+				return nil, err
+			}
+
+			webhookFilterIn.Condition = filterOpCondition
+			filters = append(filters, webhookFilterIn)
+		}
+
+		if _, ok := filter["regexp"]; ok {
+			var webhookFilterRegexp WebhookFilterRegexp
+			err = json.Unmarshal(byteArray, &webhookFilterRegexp)
+			if err != nil {
+				return nil, err
+			}
+
+			webhookFilterRegexp.Condition = filterOpCondition
+			filters = append(filters, webhookFilterRegexp)
+		}
+	}
+
+	return filters, nil
 }
 
 // WebhookHeader model
