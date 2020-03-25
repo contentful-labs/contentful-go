@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 )
 
+// Webhook doc constants
 const (
 	WebhookFilterDocContentType = "sys.contentType.sys.id"
 	WebhookFilterDocEnvironment = "sys.environment.sys.id"
