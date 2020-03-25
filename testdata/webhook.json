@@ -3,45 +3,57 @@
   "httpBasicUsername": "username",
   "name": "webhook-name",
   "headers": [
-	{
-	  "key": "header1",
-	  "value": "header1-value"
-	},
-	{
-	  "key": "header2",
-	  "value": "header2-value"
-	}
+    {
+      "key": "header1",
+      "value": "header1-value"
+    },
+    {
+      "key": "header2",
+      "value": "header2-value"
+    }
   ],
   "topics": [
-	"Entry.create",
-	"ContentType.create"
+    "Entry.create",
+    "ContentType.create"
+  ],
+  "filters": [
+    {
+      "not": {
+        "equals": [
+          {
+            "doc": "sys.environment.sys.id"
+          },
+          "test"
+        ]
+      }
+    }
   ],
   "sys": {
-	"type": "WebhookDefinition",
-	"id": "7fstd9fZ9T2p3kwD49FxhI",
-	"version": 0,
-	"space": {
-	  "sys": {
-		"type": "Link",
-		"linkType": "Space",
-		"id": "q65ipbk62rgw"
-	  }
-	},
-	"createdBy": {
-	  "sys": {
-		"type": "Link",
-		"linkType": "User",
-		"id": "7aAReMWo8woRiCCd2wFNwB"
-	  }
-	},
-	"createdAt": "2017-03-20T17:52:38Z",
-	"updatedBy": {
-	  "sys": {
-		"type": "Link",
-		"linkType": "User",
-		"id": "7aAReMWo8woRiCCd2wFNwB"
-	  }
-	},
-	"updatedAt": "2017-03-20T17:52:38Z"
+    "type": "WebhookDefinition",
+    "id": "7fstd9fZ9T2p3kwD49FxhI",
+    "version": 0,
+    "space": {
+      "sys": {
+        "type": "Link",
+        "linkType": "Space",
+        "id": "q65ipbk62rgw"
+      }
+    },
+    "createdBy": {
+      "sys": {
+        "type": "Link",
+        "linkType": "User",
+        "id": "7aAReMWo8woRiCCd2wFNwB"
+      }
+    },
+    "createdAt": "2017-03-20T17:52:38Z",
+    "updatedBy": {
+      "sys": {
+        "type": "Link",
+        "linkType": "User",
+        "id": "7aAReMWo8woRiCCd2wFNwB"
+      }
+    },
+    "updatedAt": "2017-03-20T17:52:38Z"
   }
 }
