@@ -37,6 +37,22 @@ func TestWebhookSaveForCreate(t *testing.T) {
 		header1 := headers[0].(map[string]interface{})
 		header2 := headers[1].(map[string]interface{})
 
+		filters := payload["filters"].([]interface{})
+		filter1Map := filters[0].(map[string]interface{})
+		filter1 := filter1Map["not"]
+		b, err := json.Marshal(filter1); if err != nil {
+			t.Error(err)
+		}
+
+		var equalsFilter = WebhookFilterEquals{}
+		err = json.Unmarshal(b, &equalsFilter); if err != nil {
+			t.Error(err)
+		}
+
+		assert.Equal(false, equalsFilter.Condition)
+		assert.Equal(WebhookFilterDocEnvironment, equalsFilter.Doc)
+		assert.Equal("master", equalsFilter.Equals)
+
 		assert.Equal("header1", header1["key"].(string))
 		assert.Equal("header1-value", header1["value"].(string))
 
@@ -72,6 +88,13 @@ func TestWebhookSaveForCreate(t *testing.T) {
 			&WebhookHeader{
 				Key:   "header2",
 				Value: "header2-value",
+			},
+		},
+		Filters: []WebhookFilter{
+			WebhookFilterEquals{
+				Condition: false,
+				Doc:       WebhookFilterDocEnvironment,
+				Equals:    "master",
 			},
 		},
 	}
@@ -152,6 +175,13 @@ func TestWebhookSaveForUpdate(t *testing.T) {
 			Value: "updated-header2-value",
 		},
 	}
+	webhook.Filters = []WebhookFilter{
+		WebhookFilterEquals{
+			Condition: true,
+			Doc:       WebhookFilterDocContentType,
+			Equals:    "page",
+		},
+	}
 
 	err = cma.Webhooks.Upsert(spaceID, webhook)
 	assert.Nil(err)
@@ -159,6 +189,9 @@ func TestWebhookSaveForUpdate(t *testing.T) {
 	assert.Equal(1, webhook.Sys.Version)
 	assert.Equal("updated-webhook-name", webhook.Name)
 	assert.Equal("updated-username", webhook.HTTPBasicUsername)
+	assert.Equal(true, webhook.Filters[0].(WebhookFilterEquals).Condition)
+	assert.Equal(WebhookFilterDocContentType, webhook.Filters[0].(WebhookFilterEquals).Doc)
+	assert.Equal("page", webhook.Filters[0].(WebhookFilterEquals).Equals)
 }
 
 func TestWebhookDelete(t *testing.T) {
