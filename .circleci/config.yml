@@ -16,8 +16,8 @@ jobs:
     steps:
       - checkout
 
-      - run: make build
-      - run: make test
+      - run: go build ./...
+      - run: go test ./...
       # this causes and error if go fmt find an issue with formatting
       - run:
           name: "Enforce Go Formatted Code"
