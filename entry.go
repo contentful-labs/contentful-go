@@ -92,8 +92,7 @@ func (service *EntriesService) Get(spaceID, entryID string) (*Entry, error) {
 	return &entry, err
 }
 
-
-// Upsert updates or creates a new space
+// Upsert updates or creates a new entry
 func (service *EntriesService) Upsert(spaceID string, entry *Entry) error {
 	fields := map[string]interface{}{
 		"fields": entry.Fields,
