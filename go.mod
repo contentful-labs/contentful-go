@@ -1,4 +1,4 @@
-module github.com/outer-labs/contentful-go
+module github.com/contentful-labs/contentful-go
 
 go 1.12
 
