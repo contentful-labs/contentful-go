@@ -75,7 +75,7 @@ func (service *EntriesService) List(spaceID string) *Collection {
 
 // Get returns a single entry
 func (service *EntriesService) Get(spaceID, entryID string) (*Entry, error) {
-	path := fmt.Sprintf("/spaces/%s/environment/%s/entries/%s", spaceID, service.c.Environment, entryID)
+	path := fmt.Sprintf("/spaces/%s/environments/%s/entries/%s", spaceID, service.c.Environment, entryID)
 	query := url.Values{}
 	method := "GET"
 
