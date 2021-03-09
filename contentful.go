@@ -33,6 +33,7 @@ type Client struct {
 	Entries      *EntriesService
 	Locales      *LocalesService
 	Webhooks     *WebhooksService
+	Uploads      *UploadService
 }
 
 type service struct {
@@ -104,7 +105,8 @@ func NewCPA(token string) *Client {
 		Headers: map[string]string{
 			"Authorization": "Bearer " + token,
 		},
-		BaseURL: "https://preview.contentful.com",
+		BaseURL:     "https://preview.contentful.com",
+		Environment: "master",
 	}
 
 	c.Spaces = &SpacesService{c: c}
@@ -114,6 +116,26 @@ func NewCPA(token string) *Client {
 	c.Entries = &EntriesService{c: c}
 	c.Locales = &LocalesService{c: c}
 	c.Webhooks = &WebhooksService{c: c}
+
+	return c
+}
+
+// NewCUP returns a CUP client
+func NewCUP(token string) *Client {
+	c := &Client{
+		client: http.DefaultClient,
+		Debug:  false,
+		api:    "CUP",
+		token:  token,
+		Headers: map[string]string{
+			"Authorization": "Bearer " + token,
+		},
+		BaseURL:     "https://upload.contentful.com",
+		Environment: "master",
+	}
+
+	c.Assets = &AssetsService{c: c}
+	c.Uploads = &UploadService{c: c}
 
 	return c
 }
@@ -178,10 +200,12 @@ func (c *Client) do(req *http.Request, v interface{}) error {
 	if res.StatusCode >= 200 && res.StatusCode < 400 {
 		if v != nil {
 			defer res.Body.Close()
+
 			err = json.NewDecoder(res.Body).Decode(v)
 			if err != nil {
 				return err
 			}
+
 		}
 
 		return nil
