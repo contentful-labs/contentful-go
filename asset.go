@@ -16,6 +16,7 @@ type File struct {
 	ContentType string      `json:"contentType,omitempty"`
 	URL         string      `json:"url,omitempty"`
 	UploadURL   string      `json:"upload,omitempty"`
+	UploadFrom  *UploadFrom `json:"uploadFrom,omitempty"`
 	Detail      *FileDetail `json:"details,omitempty"`
 }
 
@@ -43,6 +44,11 @@ type Asset struct {
 	locale string
 	Sys    *Sys        `json:"sys"`
 	Fields *FileFields `json:"fields"`
+}
+
+//SetLocale for set the private field locale in the Asset struct
+func (asset *Asset) SetLocale(locale string) {
+	asset.locale = locale
 }
 
 // MarshalJSON for custom json marshaling
@@ -90,6 +96,7 @@ func (asset *Asset) UnmarshalJSON(data []byte) error {
 		localized = false
 	}
 
+
 	if localized == false {
 		asset.Sys = &Sys{}
 		b, _ := json.Marshal(payload["sys"])
@@ -114,7 +121,12 @@ func (asset *Asset) UnmarshalJSON(data []byte) error {
 		}
 
 		file := payload["fields"].(map[string]interface{})["file"].(map[string]interface{})[asset.locale]
-		if err := json.Unmarshal([]byte(file.(string)), asset.Fields.File); err != nil {
+		byteFile, err := json.Marshal(file)
+		if err != nil {
+			return err
+		}
+
+		if err := json.Unmarshal(byteFile, asset.Fields.File); err != nil {
 			return err
 		}
 	} else {
@@ -138,7 +150,7 @@ func (asset *Asset) GetVersion() int {
 
 // List returns asset collection
 func (service *AssetsService) List(spaceID string) *Collection {
-	path := fmt.Sprintf("/spaces/%s/assets", spaceID)
+	path := fmt.Sprintf("/spaces/%s/environments/%s/assets", spaceID, service.c.Environment)
 	method := "GET"
 
 	req, err := service.c.newRequest(method, path, nil, nil)
@@ -149,6 +161,7 @@ func (service *AssetsService) List(spaceID string) *Collection {
 	col := NewCollection(&CollectionOptions{})
 	col.c = service.c
 	col.req = req
+	col.c.do(col.req, col)
 
 	return col
 }
@@ -173,7 +186,7 @@ func (service *AssetsService) Get(spaceID, assetID string) (*Asset, error) {
 
 // Upsert updates or creates a new asset entity
 func (service *AssetsService) Upsert(spaceID string, asset *Asset) error {
-	bytesArray, err := json.Marshal(asset)
+	bytesArray, err := json.MarshalIndent(asset,"", "\t")
 	if err != nil {
 		return err
 	}
@@ -182,7 +195,7 @@ func (service *AssetsService) Upsert(spaceID string, asset *Asset) error {
 	var method string
 
 	if asset.Sys.CreatedAt != "" {
-		path = fmt.Sprintf("/spaces/%s/assets/%s", spaceID, asset.Sys.ID)
+		path = fmt.Sprintf("/spaces/%s/environments/%s/assets/%s", spaceID, service.c.Environment, asset.Sys.ID)
 		method = "PUT"
 	} else {
 		path = fmt.Sprintf("/spaces/%s/assets", spaceID)
@@ -233,7 +246,7 @@ func (service *AssetsService) Process(spaceID string, asset *Asset) error {
 
 // Publish published the asset
 func (service *AssetsService) Publish(spaceID string, asset *Asset) error {
-	path := fmt.Sprintf("/spaces/%s/assets/%s/published", spaceID, asset.Sys.ID)
+	path := fmt.Sprintf("/spaces/%s/environments/%s/assets/%s/published", spaceID, service.c.Environment, asset.Sys.ID)
 	method := "PUT"
 
 	req, err := service.c.newRequest(method, path, nil, nil)
@@ -241,7 +254,7 @@ func (service *AssetsService) Publish(spaceID string, asset *Asset) error {
 		return err
 	}
 
-	version := strconv.Itoa(asset.Sys.Version)
+	version := strconv.Itoa(asset.Sys.Version+1)
 	req.Header.Set("X-Contentful-Version", version)
 
 	return service.c.do(req, asset)
