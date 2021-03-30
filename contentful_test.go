@@ -145,7 +145,7 @@ func TestContentfulNewCMA(t *testing.T) {
 	assert.Equal(CMAToken, cma.token)
 	assert.Equal(fmt.Sprintf("Bearer %s", CMAToken), cma.Headers["Authorization"])
 	assert.Equal("application/vnd.contentful.management.v1+json", cma.Headers["Content-Type"])
-	assert.Equal(fmt.Sprintf("sdk contentful.go/%s", Version), cma.Headers["X-Contentful-User-Agent"])
+	assert.Equal(fmt.Sprintf("sdk contentful-go/%s", Version), cma.Headers["X-Contentful-User-Agent"])
 }
 
 func TestContentfulNewCDA(t *testing.T) {
