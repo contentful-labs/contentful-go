@@ -76,7 +76,7 @@ func NewCDA(token string) *Client {
 		Headers: map[string]string{
 			"Authorization":           "Bearer " + token,
 			"Content-Type":            "application/vnd.contentful.delivery.v1+json",
-			"X-Contentful-User-Agent": fmt.Sprintf("contentful-go/%s", Version),
+			"X-Contentful-User-Agent": fmt.Sprintf("sdk contentful.go/%s", Version),
 		},
 		BaseURL:     "https://cdn.contentful.com",
 		Environment: "master",
