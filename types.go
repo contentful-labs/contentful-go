@@ -7,7 +7,9 @@ type Sys struct {
 	LinkType         string       `json:"linkType,omitempty"`
 	CreatedAt        string       `json:"createdAt,omitempty"`
 	UpdatedAt        string       `json:"updatedAt,omitempty"`
-	UpdatedBy        *Sys         `json:"updatedBy,omitempty"`
+	UpdatedBy        struct{
+		           *Sys         `json:"sys,omitempty"`
+	} `json:"updatedBy,omitempty"`
 	Version          int          `json:"version,omitempty"`
 	Revision         int          `json:"revision,omitempty"`
 	ContentType      *ContentType `json:"contentType,omitempty"`
@@ -15,6 +17,8 @@ type Sys struct {
 	FirstPublishedAt string       `json:"firstPublishedAt,omitempty"`
 	PublishedCounter int          `json:"publishedCounter,omitempty"`
 	PublishedAt      string       `json:"publishedAt,omitempty"`
-	PublishedBy      *Sys         `json:"publishedBy,omitempty"`
+	PublishedBy      struct {
+		*Sys         `json:"sys,omitempty"`
+	} `json:"publishedBy,omitempty"`
 	PublishedVersion int          `json:"publishedVersion,omitempty"`
 }
