@@ -178,7 +178,7 @@ func (service *AssetsService) Get(spaceID, assetID string) (*Asset, error) {
 }
 
 // GetLocalized returns a single asset entity. You need to specify the target locale you wish to retrieve.
-func (service *AssetsService) GetLocalized(spaceID, assetID string, local string) (*Asset, error) {
+func (service *AssetsService) GetLocalized(spaceID, assetID string, locale string) (*Asset, error) {
 	path := fmt.Sprintf("/spaces/%s/assets/%s", spaceID, assetID)
 	method := "GET"
 
@@ -187,7 +187,7 @@ func (service *AssetsService) GetLocalized(spaceID, assetID string, local string
 		return nil, err
 	}
 
-	asset := Asset{locale: local}
+	asset := Asset{locale: locale}
 	if err := service.c.do(req, &asset); err != nil {
 		return nil, err
 	}
