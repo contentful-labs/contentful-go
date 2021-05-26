@@ -133,7 +133,7 @@ func (service *EntriesService) Upsert(spaceID string, entry *Entry) error {
 
 // Delete the entry
 func (service *EntriesService) Delete(spaceID string, entryID string) error {
-	path := fmt.Sprintf("/spaces/%s/entries/%s/environments/%s", spaceID, service.c.Environment, entryID)
+	path := fmt.Sprintf("/spaces/%s/environments/%s/entries//%s", spaceID, service.c.Environment, entryID)
 	method := "DELETE"
 
 	req, err := service.c.newRequest(method, path, nil, nil)
