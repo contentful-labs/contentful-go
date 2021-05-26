@@ -162,7 +162,7 @@ func (service *EntriesService) Publish(spaceID string, entry *Entry) error {
 
 // Unpublish the entry
 func (service *EntriesService) Unpublish(spaceID string, entry *Entry) error {
-	path := fmt.Sprintf("/spaces/%s/entries/%s/published", spaceID, entry.Sys.ID)
+	path := fmt.Sprintf("/spaces/%s/environments/%s/entries/%s/published", spaceID, service.c.Environment, entry.Sys.ID)
 	method := "DELETE"
 
 	req, err := service.c.newRequest(method, path, nil, nil)
