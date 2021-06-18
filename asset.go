@@ -108,13 +108,19 @@ func (asset *Asset) UnmarshalJSON(data []byte) error {
 		}
 
 		asset.Fields = &FileFields{
-			Title:       title.(string),
-			Description: description.(string),
-			File:        &File{},
+			Title: title.(string),
+			File:  &File{},
+		}
+		if description != nil {
+			asset.Fields.Description = description.(string)
 		}
 
 		file := payload["fields"].(map[string]interface{})["file"].(map[string]interface{})[asset.locale]
-		if err := json.Unmarshal([]byte(file.(string)), asset.Fields.File); err != nil {
+		marshal, err := json.Marshal(file.(map[string]interface{}))
+		if err != nil {
+			return err
+		}
+		if err := json.Unmarshal(marshal, asset.Fields.File); err != nil {
 			return err
 		}
 	} else {
@@ -164,6 +170,24 @@ func (service *AssetsService) Get(spaceID, assetID string) (*Asset, error) {
 	}
 
 	var asset Asset
+	if err := service.c.do(req, &asset); err != nil {
+		return nil, err
+	}
+
+	return &asset, nil
+}
+
+// GetLocalized returns a single asset entity. You need to specify the target locale you wish to retrieve.
+func (service *AssetsService) GetLocalized(spaceID, assetID string, locale string) (*Asset, error) {
+	path := fmt.Sprintf("/spaces/%s/assets/%s", spaceID, assetID)
+	method := "GET"
+
+	req, err := service.c.newRequest(method, path, nil, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	asset := Asset{locale: locale}
 	if err := service.c.do(req, &asset); err != nil {
 		return nil, err
 	}
