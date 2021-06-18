@@ -75,7 +75,7 @@ func (service *EntriesService) List(spaceID string) *Collection {
 
 // Get returns a single entry
 func (service *EntriesService) Get(spaceID, entryID string) (*Entry, error) {
-	path := fmt.Sprintf("/spaces/%s/entries/%s", spaceID, entryID)
+	path := fmt.Sprintf("/spaces/%s/environments/%s/entries/%s", spaceID, service.c.Environment, entryID)
 	query := url.Values{}
 	method := "GET"
 
@@ -133,7 +133,7 @@ func (service *EntriesService) Upsert(spaceID string, entry *Entry) error {
 
 // Delete the entry
 func (service *EntriesService) Delete(spaceID string, entryID string) error {
-	path := fmt.Sprintf("/spaces/%s/entries/%s", spaceID, entryID)
+	path := fmt.Sprintf("/spaces/%s/environments/%s/entries//%s", spaceID, service.c.Environment, entryID)
 	method := "DELETE"
 
 	req, err := service.c.newRequest(method, path, nil, nil)
@@ -146,7 +146,7 @@ func (service *EntriesService) Delete(spaceID string, entryID string) error {
 
 // Publish the entry
 func (service *EntriesService) Publish(spaceID string, entry *Entry) error {
-	path := fmt.Sprintf("/spaces/%s/entries/%s/published", spaceID, entry.Sys.ID)
+	path := fmt.Sprintf("/spaces/%s/environments/%s/entries/%s/published", spaceID, service.c.Environment, entry.Sys.ID)
 	method := "PUT"
 
 	req, err := service.c.newRequest(method, path, nil, nil)
@@ -162,7 +162,7 @@ func (service *EntriesService) Publish(spaceID string, entry *Entry) error {
 
 // Unpublish the entry
 func (service *EntriesService) Unpublish(spaceID string, entry *Entry) error {
-	path := fmt.Sprintf("/spaces/%s/entries/%s/published", spaceID, entry.Sys.ID)
+	path := fmt.Sprintf("/spaces/%s/environments/%s/entries/%s/published", spaceID, service.c.Environment, entry.Sys.ID)
 	method := "DELETE"
 
 	req, err := service.c.newRequest(method, path, nil, nil)
