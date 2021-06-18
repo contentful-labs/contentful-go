@@ -2,6 +2,10 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Build Status](https://travis-ci.com/contentful-labs/contentful-go.svg?token=ppF3HxXy28XU9AwHHiGX&branch=master)](https://travis-ci.com/contentful-labs/contentful-go)
 
+❗ Disclaimer
+=====
+
+**This project is not actively maintained or monitored.** Feel free to fork and work on it in your account. If you want to maintain but also collaborate with fellow developers, feel free to reach out to [Contentful's Developer Relations](mailto:devrel-mkt@contentful.com) team to move the project into our community GitHub organisation [contentful-userland](https://github.com/contentful-userland/).
 
 # contentful-go
 
