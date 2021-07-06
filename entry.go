@@ -69,13 +69,13 @@ func (service *EntriesService) List(spaceID string) *Collection {
 	col := NewCollection(&CollectionOptions{})
 	col.c = service.c
 	col.req = req
-	
+
 	return col
 }
 
 // Get returns a single entry
 func (service *EntriesService) Get(spaceID, entryID string) (*Entry, error) {
-	path := fmt.Sprintf("/spaces/%s/entries/%s", spaceID, entryID)
+	path := fmt.Sprintf("/spaces/%s/environments/%s/entries/%s", spaceID, service.c.Environment, entryID)
 	query := url.Values{}
 	method := "GET"
 

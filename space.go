@@ -21,9 +21,11 @@ type Space struct {
 // MarshalJSON for custom json marshaling
 func (space *Space) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&struct {
+		Sys           *Sys   `json:"sys,omitempty"`
 		Name          string `json:"name,omitempty"`
 		DefaultLocale string `json:"defaultLocale,omitempty"`
 	}{
+		Sys:           space.Sys,
 		Name:          space.Name,
 		DefaultLocale: space.DefaultLocale,
 	})
