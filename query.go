@@ -10,57 +10,61 @@ import (
 
 //Query model
 type Query struct {
-	include     uint16
-	contentType string
-	fields      []string
-	e           map[string]interface{}
-	ne          map[string]interface{}
-	all         map[string][]string
-	in          map[string][]string
-	nin         map[string][]string
-	exists      []string
-	notExists   []string
-	lt          map[string]interface{}
-	lte         map[string]interface{}
-	gt          map[string]interface{}
-	gte         map[string]interface{}
-	q           string
-	match       map[string]string
-	near        map[string]string
-	within      map[string]string
-	order       []string
-	limit       uint16
-	skip        uint16
-	mime        string
-	locale      string
+	include      uint16
+	contentType  string
+	fields       []string
+	e            map[string]interface{}
+	ne           map[string]interface{}
+	all          map[string][]string
+	in           map[string][]string
+	nin          map[string][]string
+	exists       []string
+	notExists    []string
+	lt           map[string]interface{}
+	lte          map[string]interface{}
+	gt           map[string]interface{}
+	gte          map[string]interface{}
+	q            string
+	match        map[string]string
+	near         map[string]string
+	within       map[string]string
+	order        []string
+	limit        uint16
+	skip         uint16
+	mime         string
+	locale       string
+	linksToEntry string
+	linksToAsset string
 }
 
 //NewQuery initilazies a new query
 func NewQuery() *Query {
 	return &Query{
-		include:     0,
-		contentType: "",
-		fields:      []string{},
-		e:           make(map[string]interface{}),
-		ne:          make(map[string]interface{}),
-		all:         make(map[string][]string),
-		in:          make(map[string][]string),
-		nin:         make(map[string][]string),
-		exists:      []string{},
-		notExists:   []string{},
-		lt:          make(map[string]interface{}),
-		lte:         make(map[string]interface{}),
-		gt:          make(map[string]interface{}),
-		gte:         make(map[string]interface{}),
-		q:           "",
-		match:       make(map[string]string),
-		near:        make(map[string]string),
-		within:      make(map[string]string),
-		order:       []string{},
-		limit:       0,
-		skip:        0,
-		mime:        "",
-		locale:      "",
+		include:      0,
+		contentType:  "",
+		fields:       []string{},
+		e:            make(map[string]interface{}),
+		ne:           make(map[string]interface{}),
+		all:          make(map[string][]string),
+		in:           make(map[string][]string),
+		nin:          make(map[string][]string),
+		exists:       []string{},
+		notExists:    []string{},
+		lt:           make(map[string]interface{}),
+		lte:          make(map[string]interface{}),
+		gt:           make(map[string]interface{}),
+		gte:          make(map[string]interface{}),
+		q:            "",
+		match:        make(map[string]string),
+		near:         make(map[string]string),
+		within:       make(map[string]string),
+		order:        []string{},
+		limit:        0,
+		skip:         0,
+		mime:         "",
+		locale:       "",
+		linksToEntry: "",
+		linksToAsset: "",
 	}
 }
 
@@ -210,6 +214,18 @@ func (q *Query) MimeType(mime string) *Query {
 //Locale query
 func (q *Query) Locale(locale string) *Query {
 	q.locale = locale
+	return q
+}
+
+//LinksToEntry query
+func (q *Query) LinksToEntry(entryID string) *Query {
+	q.linksToEntry = entryID
+	return q
+}
+
+//LinksToAsset query
+func (q *Query) LinksToAsset(assetID string) *Query {
+	q.linksToAsset = assetID
 	return q
 }
 
@@ -399,6 +415,14 @@ func (q *Query) Values() url.Values {
 
 	if q.locale != "" {
 		params.Set("locale", q.locale)
+	}
+
+	if q.linksToEntry != "" {
+		params.Set("links_to_entry", q.linksToEntry)
+	}
+
+	if q.linksToAsset != "" {
+		params.Set("links_to_asset", q.linksToAsset)
 	}
 
 	return params

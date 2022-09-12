@@ -17,4 +17,5 @@ type Sys struct {
 	PublishedAt      string       `json:"publishedAt,omitempty"`
 	PublishedBy      *Sys         `json:"publishedBy,omitempty"`
 	PublishedVersion int          `json:"publishedVersion,omitempty"`
+	Locale           string       `json:"locale,omitempty"`
 }

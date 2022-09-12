@@ -33,6 +33,7 @@ type Client struct {
 	Entries      *EntriesService
 	Locales      *LocalesService
 	Webhooks     *WebhooksService
+	Environments *EnvironmentService
 }
 
 type service struct {
@@ -63,6 +64,8 @@ func NewCMA(token string) *Client {
 	c.Entries = (*EntriesService)(&c.commonService)
 	c.Locales = (*LocalesService)(&c.commonService)
 	c.Webhooks = (*WebhooksService)(&c.commonService)
+	c.Environments = (*EnvironmentService)(&c.commonService)
+
 	return c
 }
 
@@ -90,6 +93,7 @@ func NewCDA(token string) *Client {
 	c.Entries = (*EntriesService)(&c.commonService)
 	c.Locales = (*LocalesService)(&c.commonService)
 	c.Webhooks = (*WebhooksService)(&c.commonService)
+	c.Environments = (*EnvironmentService)(&c.commonService)
 
 	return c
 }
@@ -105,6 +109,7 @@ func NewCPA(token string) *Client {
 			"Authorization": "Bearer " + token,
 		},
 		BaseURL: "https://preview.contentful.com",
+		Environment: "master",
 	}
 
 	c.Spaces = &SpacesService{c: c}
@@ -114,6 +119,7 @@ func NewCPA(token string) *Client {
 	c.Entries = &EntriesService{c: c}
 	c.Locales = &LocalesService{c: c}
 	c.Webhooks = &WebhooksService{c: c}
+	c.Environments = &EnvironmentService{c: c}
 
 	return c
 }
