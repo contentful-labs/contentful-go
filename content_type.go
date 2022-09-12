@@ -35,6 +35,9 @@ const (
 	// FieldTypeInteger content type field type for integer data
 	FieldTypeInteger = "Integer"
 
+	// FieldTypeNumber content type field type for float data
+	FieldTypeNumber = "Number"
+
 	// FieldTypeLocation content type field type for location data
 	FieldTypeLocation = "Location"
 
